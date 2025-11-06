@@ -50,24 +50,25 @@ func NewWebhookController(service payments_service.PaymentsRepo) *WebhookControl
 }
 
 func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
-	var payload WebhookRequest
+	var request WebhookRequest
 
-	if err := c.Bind(&payload); err != nil {
-		log.Println("Failed to bind webhook payload:", err)
-		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest("Invalid payload"))
+	if err := c.Bind(&request); err != nil {
+		log.Println("Failed to bind webhook request:", err)
+		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest("Invalid request"))
 	}
 
-	log.Printf("Received webhook from Xendit: %+v\n", payload)
+	log.Print("Received webhook from Xendit:", request)
 
-	paymentId, _ := strconv.Atoi(payload.ExternalID)
+	paymentId, _ := strconv.Atoi(request.ExternalID)
 
-	if payload.Status == "PAID" {
-		err := ctrl.service.UpdateStatus(paymentId, payload.Status)
+	if request.Status == "PAID" {
+		err := ctrl.service.UpdateStatus(paymentId, request.Status)
 		if err != nil {
-			log.Println("Failed to update payment status:", err)
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError("Failed to update payment"))
+			log.Println("Failed to update payment status:", err.Error())
+			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 		}
 	}
 
-	return c.JSON(http.StatusOK, fres.Response.StatusOK("Webhook received"))
+	log.Print(request)
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(http.StatusOK))
 }
