@@ -38,9 +38,9 @@ func (r *PaymentsGormRepository) GetById(id int, userId string) (payments_servic
 	return payment, nil
 }
 
-func (r *PaymentsGormRepository) UpdateStatus(id int, userId, status string) error {
+func (r *PaymentsGormRepository) UpdateStatus(id int, status string) error {
 	ctx := context.Background()
-	err := r.DB.WithContext(ctx).Where("id=?", id).Where("user_id=?", userId).Update("status", status).Error
+	err := r.DB.WithContext(ctx).Where("id=?", id).Update("status", status).Error
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,6 @@ package webhook_controller
 
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -51,28 +50,24 @@ func NewWebhookController(service payments_service.PaymentsRepo) *WebhookControl
 }
 
 func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
-	var request WebhookRequest
-	userId := c.Get("id").(string)
+	var payload WebhookRequest
 
-	if err := c.Bind(&request); err != nil {
-		log.Print("Error on CreateEquipment request body:", err.Error())
-		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
+	if err := c.Bind(&payload); err != nil {
+		log.Println("Failed to bind webhook payload:", err)
+		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest("Invalid payload"))
 	}
 
-	if err := ctrl.validate.Struct(request); err != nil {
-		log.Print("Error on CreateEquipment validation:", err.Error())
-		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
-	}
+	log.Printf("Received webhook from Xendit: %+v\n", payload)
 
-	paymentId, _ := strconv.Atoi(request.ExternalID)
-	if request.Status == "PAID" {
-		err := ctrl.service.UpdateStatus(paymentId, userId, request.Status)
+	paymentId, _ := strconv.Atoi(payload.ExternalID)
+
+	if payload.Status == "PAID" {
+		err := ctrl.service.UpdateStatus(paymentId, payload.Status)
 		if err != nil {
-			log.Print("Error on create rental server:", err.Error())
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+			log.Println("Failed to update payment status:", err)
+			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError("Failed to update payment"))
 		}
 	}
 
-	log.Print("Successfully create a rental")
-	return c.JSON(http.StatusOK, fres.Response.StatusOK(fmt.Sprintf("Successfully paid the payment with ID: %d", paymentId)))
+	return c.JSON(http.StatusOK, fres.Response.StatusOK("Webhook received"))
 }

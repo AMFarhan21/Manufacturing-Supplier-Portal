@@ -7,7 +7,7 @@ type PaymentsService struct {
 type Service interface {
 	Create(data Payments) (Payments, error)
 	GetById(id int, userId string) (Payments, error)
-	UpdateStatus(id int, userId, status string) error
+	UpdateStatus(id int, status string) error
 }
 
 func NewPaymentsService(repo PaymentsRepo) Service {
@@ -22,6 +22,6 @@ func (s PaymentsService) Create(data Payments) (Payments, error) {
 func (s PaymentsService) GetById(id int, userId string) (Payments, error) {
 	return s.repo.GetById(id, userId)
 }
-func (s PaymentsService) UpdateStatus(id int, userId, status string) error {
-	return s.repo.UpdateStatus(id, userId, status)
+func (s PaymentsService) UpdateStatus(id int, status string) error {
+	return s.repo.UpdateStatus(id, status)
 }
