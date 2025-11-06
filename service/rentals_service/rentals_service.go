@@ -163,7 +163,7 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		now := time.Now()
 		startDate = now.Format("2006-01-02")
 		endDate = now.Add(time.Hour * period).Format("2006-01-02")
-		err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, true)
+		err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, false)
 		if err != nil {
 			return err
 		}

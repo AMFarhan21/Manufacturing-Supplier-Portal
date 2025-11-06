@@ -81,9 +81,9 @@ func (r *EquipmentsGormRepository) Delete(id int) error {
 	return nil
 }
 
-func (r *EquipmentsGormRepository) UpdateStatus(id int, status bool) error {
+func (r *EquipmentsGormRepository) UpdateStatus(id int, available bool) error {
 	ctx := context.Background()
-	row := r.DB.WithContext(ctx).Where("id=?", id).Update("status", status)
+	row := r.DB.WithContext(ctx).Where("id=?", id).Update("available", available)
 	if row.RowsAffected == 0 {
 		return errors.New("equipment id not found")
 	}
