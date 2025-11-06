@@ -131,7 +131,7 @@ func (s RentalsService) rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipment
 	return rentalWithInvoiceUrl, nil
 }
 
-func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error {
+func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string) error {
 	payment, err := s.paymentsRepo.GetById(paymentId, userId)
 	if err != nil {
 		return err
@@ -142,14 +142,12 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus
 		return err
 	}
 
-	var status string
 	var period time.Duration
 	var startDate string
 	var endDate string
 
-	switch paymentStatus {
-	case "PAID":
-		status = "ACTIVE"
+	switch status {
+	case "ACTIVE":
 		switch rental.RentalPeriod {
 		case "day":
 			period = 24
@@ -179,10 +177,9 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus
 			return err
 		}
 
-	case "EXPIRED":
+	case "CANCELLED":
 		// startDate = ""
 		// endDate = ""
-		status = "CANCELLED"
 		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
 			RentalId:  rental.RentalId,
 			UserId:    rental.UserId,
@@ -194,5 +191,5 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus
 		}
 	}
 
-	return s.rentalRepo.UpdateStatusAndDate(payment.RentalId, status, startDate, endDate)
+	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
 }

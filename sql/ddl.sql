@@ -35,7 +35,7 @@ CREATE TABLE rentals (
     start_date date,
     end_date date,
     price decimal(12, 2) not null,
-    status varchar(20) not null,
+    status varchar(20) not null, --pending, active, cancelled, completed
     created_at timestamp default current_timestamp not null
 );
 
