@@ -21,7 +21,7 @@ type Service interface {
 	CreateRental(data Rentals) (RentalsWithInvoiceUrl, error)
 	createPayment(rental Rentals) (payments_service.Payments, error)
 	rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
-	UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error
+	UpdateStatusAndDate(paymentId int, userId, status string) error
 }
 
 func NewRentalsService(
@@ -178,8 +178,6 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		}
 
 	case "CANCELLED":
-		// startDate = ""
-		// endDate = ""
 		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
 			RentalId:  rental.RentalId,
 			UserId:    rental.UserId,
@@ -191,5 +189,15 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		}
 	}
 
+	// case "CANCELLED":
+	// 	_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+	// 		RentalId:  rental.RentalId,
+	// 		UserId:    rental.UserId,
+	// 		Status:    status,
+	// 		CreatedAt: rental.CreatedAt,
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
 	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
 }

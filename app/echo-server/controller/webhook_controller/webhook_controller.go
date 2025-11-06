@@ -79,12 +79,17 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 		if err != nil {
 			log.Println("Failed to update payment status:", err.Error())
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
-
 		}
 	}
 
 	if request.Status == "EXPIRED" {
-		err := ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "CANCELLED")
+		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
+		if err != nil {
+			log.Println("Failed to update payment status:", err.Error())
+			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+		}
+
+		err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "CANCELLED")
 		if err != nil {
 			log.Println("Failed to update payment status:", err.Error())
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
