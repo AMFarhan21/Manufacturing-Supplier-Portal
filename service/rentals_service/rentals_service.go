@@ -6,6 +6,7 @@ import (
 	"Manufacturing-Supplier-Portal/service/rental_histories_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -169,7 +170,7 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 
 		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
 			RentalId:  rental.RentalId,
-			UserId:    rental.UserId,
+			UserId:    userId,
 			Status:    status,
 			CreatedAt: rental.CreatedAt,
 		})
@@ -180,7 +181,7 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 	case "CANCELLED":
 		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
 			RentalId:  rental.RentalId,
-			UserId:    rental.UserId,
+			UserId:    userId,
 			Status:    status,
 			CreatedAt: rental.CreatedAt,
 		})
@@ -189,15 +190,14 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		}
 	}
 
-	// case "CANCELLED":
-	// 	_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
-	// 		RentalId:  rental.RentalId,
-	// 		UserId:    rental.UserId,
-	// 		Status:    status,
-	// 		CreatedAt: rental.CreatedAt,
-	// 	})
-	// 	if err != nil {
-	// 		return err
-	// 	}
+	fmt.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
+	fmt.Println("STATUS:", status)
+	fmt.Println("PAYMENT_ID:", paymentId)
+	fmt.Println("USER_ID:", userId)
+	fmt.Println("START_DATE:", startDate)
+	fmt.Println("END_DATE:", endDate)
+	fmt.Println("RENTAL_ID:", payment.RentalId)
+	fmt.Println("RentalId:", rental.RentalId)
+	fmt.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
 	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
 }

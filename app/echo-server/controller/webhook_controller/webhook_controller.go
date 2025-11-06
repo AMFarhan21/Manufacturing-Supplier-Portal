@@ -3,6 +3,7 @@ package webhook_controller
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/rentals_service"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -67,6 +68,11 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 
 	paymentId, _ := strconv.Atoi(paymentIDandUserID[0])
 	userId := paymentIDandUserID[1]
+
+	fmt.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
+	fmt.Println("PAYMENT_ID:", paymentId)
+	fmt.Println("USER_ID:", userId)
+	fmt.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
 
 	if request.Status == "PAID" {
 		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
