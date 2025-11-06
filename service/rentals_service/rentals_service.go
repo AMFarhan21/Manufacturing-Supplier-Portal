@@ -2,25 +2,31 @@ package rentals_service
 
 import (
 	"Manufacturing-Supplier-Portal/service/equipments_service"
+	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
+	"errors"
 	"time"
 )
 
 type RentalsService struct {
-	rentalRepo    RentalsRepo
-	equipmentRepo equipments_service.EquipmentsRepo
-	xenditRepo    xendit_service.XenditRepo
+	rentalRepo         RentalsRepo
+	equipmentRepo      equipments_service.EquipmentsRepo
+	xenditRepo         xendit_service.XenditRepo
+	paymentsRepository payments_service.PaymentsRepo
 }
 
 type Service interface {
 	CreateRental(data Rentals) (RentalsWithInvoiceUrl, error)
+	createPayment(rental Rentals) (payments_service.Payments, error)
+	rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
 }
 
-func NewRentalsService(rentalRepo RentalsRepo, equipmentRepo equipments_service.EquipmentsRepo, xenditRepo xendit_service.XenditRepo) Service {
+func NewRentalsService(rentalRepo RentalsRepo, equipmentRepo equipments_service.EquipmentsRepo, xenditRepo xendit_service.XenditRepo, paymentsRepository payments_service.PaymentsRepo) Service {
 	return &RentalsService{
-		rentalRepo:    rentalRepo,
-		equipmentRepo: equipmentRepo,
-		xenditRepo:    xenditRepo,
+		rentalRepo:         rentalRepo,
+		equipmentRepo:      equipmentRepo,
+		xenditRepo:         xenditRepo,
+		paymentsRepository: paymentsRepository,
 	}
 }
 
@@ -69,18 +75,45 @@ func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error
 		return RentalsWithInvoiceUrl{}, err
 	}
 
+	payment, err := s.createPayment(rental)
+	if err != nil {
+		return RentalsWithInvoiceUrl{}, err
+	}
+
 	rentalEquipmentUser, err := s.rentalRepo.GetRentalById(rental.Id)
 	if err != nil {
 		return RentalsWithInvoiceUrl{}, err
 	}
 
-	invoiceUrl, err := s.xenditRepo.XenditInvoiceUrl(rentalEquipmentUser.UserId, rentalEquipmentUser.Description, rentalEquipmentUser.Username, rentalEquipmentUser.Email, rentalEquipmentUser.EquipmentName, rentalEquipmentUser.Category, rental.Id, rental.Price)
+	rentalWithInvoice, err := s.rentalWithInvoiceUrl(rentalEquipmentUser, rental, payment.Id)
 	if err != nil {
 		return RentalsWithInvoiceUrl{}, err
 	}
 
-	var rentalWithInvoiceUrl RentalsWithInvoiceUrl
+	return rentalWithInvoice, nil
+}
 
+func (s RentalsService) createPayment(rental Rentals) (payments_service.Payments, error) {
+	var dataPayments payments_service.Payments
+	dataPayments.UserId = rental.UserId
+	dataPayments.RentalId = rental.Id
+	dataPayments.Amount = rental.Price
+	dataPayments.Status = "PENDING"
+	dataPayments.CreatedAt = time.Now()
+	payment, err := s.paymentsRepository.Create(dataPayments)
+	if err != nil {
+		return payments_service.Payments{}, err
+	}
+
+	return payment, nil
+}
+
+func (s RentalsService) rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error) {
+	invoiceUrl, err := s.xenditRepo.XenditInvoiceUrl(rentalEquipmentUser.UserId, rentalEquipmentUser.Description, rentalEquipmentUser.Username, rentalEquipmentUser.Email, rentalEquipmentUser.EquipmentName, rentalEquipmentUser.Category, paymentId, rental.Price)
+	if err != nil || invoiceUrl == "" {
+		return RentalsWithInvoiceUrl{}, errors.New("failed to create invoice URL, try again")
+	}
+	var rentalWithInvoiceUrl RentalsWithInvoiceUrl
 	rentalWithInvoiceUrl.Id = rental.Id
 	rentalWithInvoiceUrl.UserId = rental.UserId
 	rentalWithInvoiceUrl.EquipmentId = rental.EquipmentId

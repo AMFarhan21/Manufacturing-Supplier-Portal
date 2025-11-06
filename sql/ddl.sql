@@ -42,11 +42,10 @@ CREATE TABLE rentals (
 CREATE TABLE payments (
     id serial primary key,
     user_id varchar(50) references users(id) not null,
-    rental_id int references rental_id(id) not null,
+    rental_id int references rentals(id) not null,
     amount decimal(12, 2) not null,
-    payment_method varchar(20) not null,
+    payment_method varchar(20),
     status varchar(20) not null,
-    invoice_url varchar(255) not null,
     created_at timestamp default current_timestamp
 );
 

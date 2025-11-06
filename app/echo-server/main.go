@@ -4,12 +4,15 @@ import (
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/equipments_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/rentals_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/users_controller"
+	"Manufacturing-Supplier-Portal/app/echo-server/controller/webhook_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/router"
 	"Manufacturing-Supplier-Portal/repository/equipments_repository"
+	"Manufacturing-Supplier-Portal/repository/payments_repository"
 	"Manufacturing-Supplier-Portal/repository/rentals_repository"
 	"Manufacturing-Supplier-Portal/repository/users_repository"
 	"Manufacturing-Supplier-Portal/repository/xendit"
 	"Manufacturing-Supplier-Portal/service/equipments_service"
+	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/rentals_service"
 	"Manufacturing-Supplier-Portal/service/users_service"
 	"Manufacturing-Supplier-Portal/utils/database"
@@ -42,11 +45,15 @@ func main() {
 	equipmentsService := equipments_service.NewEquipmentsService(equipmentsRepository)
 	equipmentsController := equipments_controller.NewEquipmentsController(equipmentsService)
 
+	paymentsRepository := payments_repository.NewPaymentsGormRepository(db)
+	paymentService := payments_service.NewPaymentsService(paymentsRepository)
+
 	rentalsRepository := rentals_repository.NewRentalsGormRepository(db)
-	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository)
+	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository)
 	rentalsController := rentals_controller.NewRentalsController(rentalsService)
 
-	router.Router(e, secret, usersController, equipmentsController, rentalsController)
+	webHookController := webhook_controller.NewWebhookController(paymentService)
+	router.Router(e, secret, usersController, equipmentsController, rentalsController, webHookController)
 
 	fmt.Println("Successfully connected to the server!")
 	e.Logger.Fatal(e.Start(":8000"))

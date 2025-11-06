@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type XenditRepository struct {
@@ -28,24 +27,17 @@ func NewXenditRepository(xenditApi, xenditUrl, xenditWebhookUrl, successRedirect
 	}
 }
 
-func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email, name, category string, rentalId int, amount float64) (string, error) {
+func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email, name, category string, paymentId int, amount float64) (string, error) {
 
 	url := r.xenditUrl
 	method := "POST"
-	externalId := fmt.Sprintf("%v-%s-%d", time.Now(), userId, rentalId)
-
-	fmt.Println("XENDITAPI", r.xenditApi)
-	fmt.Println("XENDITURL", r.xenditUrl)
-	fmt.Println("SUCCESSREDIRECTURL", r.successRedirectUrl)
-	fmt.Println("FAILUREREDIRECTURL", r.failureRedirectUrl)
 
 	payload := strings.NewReader(fmt.Sprintf(`{
-		"external_id": "%s",
+		"external_id": "%d",
 		"amount": %.2f,
 		"description": "%s",
 		"invoice_duration": 3600,
 		"customer": {
-			"username": "%s",
 			"email": "%s"
 		},
 		"success_redirect_url": "%s",
@@ -60,9 +52,12 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 			}
 		],
 		"metadata": {
-			"store_branch": "Makassar"
+			"store_branch": "Makassar",
+			"user_id": "%s",
+			"payment_id": "%d",
+			"username": "%s"
 		}
-	}      `, externalId, amount, description, username, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category))
+	}      `, paymentId, amount, description, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category, userId, paymentId, username))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
@@ -84,7 +79,7 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	var xenditReponse xendit_service.XenditResponse
 	err = json.Unmarshal(body, &xenditReponse)
@@ -95,30 +90,47 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 	return xenditReponse.InvoiceURL, nil
 }
 
-func (r XenditRepository) XenditWebhook() {
-	url := r.xenditWebhookUrl
-	method := "GET"
+// func (r XenditRepository) XenditWebhook(paymentId int) (string, error) {
+// 	url := r.xenditWebhookUrl
+// 	method := "GET"
 
-	payload := strings.NewReader(``)
+// 	payload := strings.NewReader(``)
 
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
+// 	client := &http.Client{}
+// 	req, err := http.NewRequest(method, url, payload)
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer res.Body.Close()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	res, err := client.Do(req)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(body))
-}
+// 	body, err := io.ReadAll(res.Body)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	// fmt.Println(string(body))
+
+// 	var webHookResponse xendit_service.WebhookResponse
+// 	err = json.Unmarshal(body, webHookResponse)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	var WebHookContentResponse []xendit_service.WebHookContentResponse
+// 	for _, data := range webHookResponse.Data {
+// 		_ := json.Unmarshal([]byte(data.Content), WebHookContentResponse)
+// 	}
+
+// 	var status string
+// 	for _, content := range WebHookContentResponse {
+// 		if content.ExternalID == string(paymentId) {
+// 			status = content.Status
+// 		}
+// 	}
+
+// 	return status, nil
+// }
