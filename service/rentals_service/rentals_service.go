@@ -3,16 +3,18 @@ package rentals_service
 import (
 	"Manufacturing-Supplier-Portal/service/equipments_service"
 	"Manufacturing-Supplier-Portal/service/payments_service"
+	"Manufacturing-Supplier-Portal/service/rental_histories_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
 	"time"
 )
 
 type RentalsService struct {
-	rentalRepo         RentalsRepo
-	equipmentRepo      equipments_service.EquipmentsRepo
-	xenditRepo         xendit_service.XenditRepo
-	paymentsRepository payments_service.PaymentsRepo
+	rentalRepo          RentalsRepo
+	equipmentRepo       equipments_service.EquipmentsRepo
+	xenditRepo          xendit_service.XenditRepo
+	paymentsRepo        payments_service.PaymentsRepo
+	rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo
 }
 
 type Service interface {
@@ -22,12 +24,19 @@ type Service interface {
 	UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error
 }
 
-func NewRentalsService(rentalRepo RentalsRepo, equipmentRepo equipments_service.EquipmentsRepo, xenditRepo xendit_service.XenditRepo, paymentsRepository payments_service.PaymentsRepo) Service {
+func NewRentalsService(
+	rentalRepo RentalsRepo,
+	equipmentRepo equipments_service.EquipmentsRepo,
+	xenditRepo xendit_service.XenditRepo,
+	paymentsRepo payments_service.PaymentsRepo,
+	rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo,
+) Service {
 	return &RentalsService{
-		rentalRepo:         rentalRepo,
-		equipmentRepo:      equipmentRepo,
-		xenditRepo:         xenditRepo,
-		paymentsRepository: paymentsRepository,
+		rentalRepo:          rentalRepo,
+		equipmentRepo:       equipmentRepo,
+		xenditRepo:          xenditRepo,
+		paymentsRepo:        paymentsRepo,
+		rentalHistoriesRepo: rentalHistoriesRepo,
 	}
 }
 
@@ -59,6 +68,15 @@ func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error
 	if err != nil {
 		return RentalsWithInvoiceUrl{}, err
 	}
+	_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+		RentalId:  rental.Id,
+		UserId:    rental.UserId,
+		Status:    rental.Status,
+		CreatedAt: rental.CreatedAt,
+	})
+	if err != nil {
+		return RentalsWithInvoiceUrl{}, err
+	}
 
 	payment, err := s.createPayment(rental)
 	if err != nil {
@@ -85,7 +103,7 @@ func (s RentalsService) createPayment(rental Rentals) (payments_service.Payments
 	dataPayments.Amount = rental.Price
 	dataPayments.Status = "PENDING"
 	dataPayments.CreatedAt = time.Now()
-	payment, err := s.paymentsRepository.Create(dataPayments)
+	payment, err := s.paymentsRepo.Create(dataPayments)
 	if err != nil {
 		return payments_service.Payments{}, err
 	}
@@ -114,7 +132,7 @@ func (s RentalsService) rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipment
 }
 
 func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error {
-	payment, err := s.paymentsRepository.GetById(paymentId, userId)
+	payment, err := s.paymentsRepo.GetById(paymentId, userId)
 	if err != nil {
 		return err
 	}
@@ -129,7 +147,8 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus
 	var startDate string
 	var endDate string
 
-	if paymentStatus == "PAID" {
+	switch paymentStatus {
+	case "PAID":
 		status = "ACTIVE"
 		switch rental.RentalPeriod {
 		case "day":
@@ -150,10 +169,29 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus
 			return err
 		}
 
-	} else if paymentStatus == "EXPIRED" {
-		startDate = ""
-		endDate = ""
+		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+			RentalId:  rental.RentalId,
+			UserId:    rental.UserId,
+			Status:    status,
+			CreatedAt: rental.CreatedAt,
+		})
+		if err != nil {
+			return err
+		}
+
+	case "EXPIRED":
+		// startDate = ""
+		// endDate = ""
 		status = "CANCELLED"
+		_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+			RentalId:  rental.RentalId,
+			UserId:    rental.UserId,
+			Status:    status,
+			CreatedAt: rental.CreatedAt,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	return s.rentalRepo.UpdateStatusAndDate(payment.RentalId, status, startDate, endDate)

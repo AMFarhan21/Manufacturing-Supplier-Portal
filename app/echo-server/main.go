@@ -9,6 +9,7 @@ import (
 	"Manufacturing-Supplier-Portal/app/echo-server/router"
 	"Manufacturing-Supplier-Portal/repository/equipments_repository"
 	"Manufacturing-Supplier-Portal/repository/payments_repository"
+	"Manufacturing-Supplier-Portal/repository/rental_histories_repository"
 	"Manufacturing-Supplier-Portal/repository/rentals_repository"
 	"Manufacturing-Supplier-Portal/repository/users_repository"
 	"Manufacturing-Supplier-Portal/repository/xendit"
@@ -50,8 +51,10 @@ func main() {
 	paymentService := payments_service.NewPaymentsService(paymentsRepository)
 	paymentsController := payments_controller.NewPaymentsController(paymentService)
 
+	rentalHistoriesRepository := rental_histories_repository.NewRentalHistoriesGormRepository(db)
+
 	rentalsRepository := rentals_repository.NewRentalsGormRepository(db)
-	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository)
+	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository, rentalHistoriesRepository)
 	rentalsController := rentals_controller.NewRentalsController(rentalsService)
 
 	webHookController := webhook_controller.NewWebhookController(paymentService, rentalsService)

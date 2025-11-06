@@ -49,6 +49,14 @@ CREATE TABLE payments (
     created_at timestamp default current_timestamp
 );
 
+CREATE TABLE rental_histories (
+    id serial primary key,
+    rental_id int references rentals(id) not null,
+    user_id varchar(50) references users(id) not null,
+    status varchar(20) not null,
+    created_at timestamp default current_timestamp
+);
+
 INSERT INTO categories (name, description) VALUES 
 ('Forklift', 'Forklift adalah alat berat yang digunakan untuk mengangkat dan memindahkan material berat dengan menggunakan garpu atau tine pada bagian depannya. Forklift sangat penting dalam operasi gudang dan pergudangan, memungkinkan pengangkutan barang dengan efisien dan aman.'),
 ('Crane', 'Crane adalah alat berat yang digunakan untuk mengangkat beban berat secara vertikal dan horisontal. Dengan kemampuan daya angkat yang tinggi, crane ideal untuk proyek-proyek konstruksi, pemasangan struktur, dan pemindahan material berat di ketinggian.'),

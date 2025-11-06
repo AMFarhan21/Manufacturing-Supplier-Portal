@@ -8,8 +8,8 @@ type (
 		UserId       string    `json:"user_id"`
 		EquipmentId  int       `json:"equipment_id"`
 		RentalPeriod string    `json:"rental_period"`
-		StartDate    string    `json:"start_date"`
-		EndDate      string    `json:"end_date"`
+		StartDate    *string   `json:"start_date"`
+		EndDate      *string   `json:"end_date"`
 		Price        float64   `json:"price"`
 		Status       string    `json:"status"`
 		CreatedAt    time.Time `json:"created_at"`
@@ -20,8 +20,8 @@ type (
 		UserId       string    `json:"user_id"`
 		EquipmentId  int       `json:"equipment_id"`
 		RentalPeriod string    `json:"rental_period"`
-		StartDate    string    `json:"start_date"`
-		EndDate      string    `json:"end_date"`
+		StartDate    *string   `json:"start_date"`
+		EndDate      *string   `json:"end_date"`
 		Price        float64   `json:"price"`
 		Status       string    `json:"status"`
 		CreatedAt    time.Time `json:"created_at"`
@@ -33,8 +33,8 @@ type (
 		UserId        string    `json:"user_id"`
 		EquipmentId   int       `json:"equipment_id"`
 		RentalPeriod  string    `json:"rental_period"`
-		StartDate     string    `json:"start_date"`
-		EndDate       string    `json:"end_date"`
+		StartDate     *string   `json:"start_date"`
+		EndDate       *string   `json:"end_date"`
 		Price         float64   `json:"price"`
 		Status        string    `json:"status"`
 		CreatedAt     time.Time `json:"created_at"`
