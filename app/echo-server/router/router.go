@@ -7,6 +7,7 @@ import (
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/users_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/webhook_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/middleware"
+	"log"
 	"net/http"
 
 	"github.com/AMFarhan21/fres"
@@ -32,6 +33,7 @@ func Router(
 	})
 
 	e.GET("/", func(c echo.Context) error {
+		log.Print("HELLO WORLD")
 		return c.JSON(http.StatusOK, fres.Response.StatusOK("Manufacture-Supplier-Portal"))
 	})
 
