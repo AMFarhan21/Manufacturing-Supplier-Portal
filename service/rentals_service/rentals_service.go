@@ -6,7 +6,7 @@ import (
 	"Manufacturing-Supplier-Portal/service/rental_histories_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -190,14 +190,14 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		}
 	}
 
-	fmt.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
-	fmt.Println("STATUS:", status)
-	fmt.Println("PAYMENT_ID:", paymentId)
-	fmt.Println("USER_ID:", userId)
-	fmt.Println("START_DATE:", startDate)
-	fmt.Println("END_DATE:", endDate)
-	fmt.Println("RENTAL_ID:", payment.RentalId)
-	fmt.Println("RentalId:", rental.RentalId)
-	fmt.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
+	log.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
+	log.Println("STATUS:", status)
+	log.Println("PAYMENT_ID:", paymentId)
+	log.Println("USER_ID:", userId)
+	log.Println("START_DATE:", startDate)
+	log.Println("END_DATE:", endDate)
+	log.Println("RENTAL_ID:", payment.RentalId)
+	log.Println("RentalId:", rental.RentalId)
+	log.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
 	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
 }

@@ -3,7 +3,6 @@ package webhook_controller
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/rentals_service"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -64,15 +63,15 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 
 	log.Print("Received webhook from Xendit:", request)
 
-	paymentIDandUserID := strings.Split(request.ExternalID, "-")
+	paymentIDandUserID := strings.Split(request.ExternalID, "|")
 
 	paymentId, _ := strconv.Atoi(paymentIDandUserID[0])
 	userId := paymentIDandUserID[1]
 
-	fmt.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
-	fmt.Println("PAYMENT_ID:", paymentId)
-	fmt.Println("USER_ID:", userId)
-	fmt.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
+	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
+	log.Println("PAYMENT_ID:", paymentId)
+	log.Println("USER_ID:", userId)
+	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
 
 	if request.Status == "PAID" {
 		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
