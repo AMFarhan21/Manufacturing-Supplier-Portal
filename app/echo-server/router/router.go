@@ -2,6 +2,7 @@ package router
 
 import (
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/equipments_controller"
+	"Manufacturing-Supplier-Portal/app/echo-server/controller/payments_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/rentals_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/users_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/webhook_controller"
@@ -19,6 +20,7 @@ func Router(
 	equipmentsController *equipments_controller.EquipmentsController,
 	rentalsController *rentals_controller.RentalsController,
 	webHookController *webhook_controller.WebhookController,
+	paymentsController *payments_controller.PaymentsController,
 ) {
 	middlewares := middleware.JWTMiddleware(jwtSecret)
 	adminAccess := middleware.ACLMiddleware(map[string]bool{
@@ -48,6 +50,9 @@ func Router(
 	equipments.POST("", equipmentsController.CreateEquipment, adminAccess)
 	equipments.PUT("/:id", equipmentsController.UpdateEquipment, adminAccess)
 	equipments.DELETE("/:id", equipmentsController.DeleteEquipment, adminAccess)
+
+	payments := e.Group("/api/payments", middlewares)
+	payments.GET("/:id", paymentsController.GetPaymentsById, userAccess)
 
 	e.POST("/webhook/handler", webHookController.HandleWebhook)
 

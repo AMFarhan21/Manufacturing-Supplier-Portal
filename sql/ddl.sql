@@ -32,8 +32,8 @@ CREATE TABLE rentals (
     user_id varchar(50) references users(id) not null,
     equipment_id int references equipments(id) not null,
     rental_period varchar(20) not null,
-    start_date date default current_date not null,
-    end_date date not null,
+    start_date date,
+    end_date date,
     price decimal(12, 2) not null,
     status varchar(20) not null,
     created_at timestamp default current_timestamp not null

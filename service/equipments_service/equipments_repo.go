@@ -6,4 +6,5 @@ type EquipmentsRepo interface {
 	GetById(id int) (Equipments, error)
 	Update(id int, data Equipments) (Equipments, error)
 	Delete(id int) error
+	UpdateStatus(id int, status bool) error
 }

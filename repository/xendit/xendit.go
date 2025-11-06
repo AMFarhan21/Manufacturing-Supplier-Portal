@@ -33,7 +33,7 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 	method := "POST"
 
 	payload := strings.NewReader(fmt.Sprintf(`{
-		"external_id": "%d",
+		"external_id": "%d-%s",
 		"amount": %.2f,
 		"description": "%s",
 		"invoice_duration": 3600,
@@ -57,7 +57,7 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 			"payment_id": "%d",
 			"username": "%s"
 		}
-	}      `, paymentId, amount, description, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category, userId, paymentId, username))
+	}      `, paymentId, userId, amount, description, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category, userId, paymentId, username))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)

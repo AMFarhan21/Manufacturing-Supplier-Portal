@@ -2,9 +2,11 @@ package webhook_controller
 
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"
+	"Manufacturing-Supplier-Portal/service/rentals_service"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/AMFarhan21/fres"
@@ -14,8 +16,9 @@ import (
 
 type (
 	WebhookController struct {
-		service  payments_service.PaymentsRepo
-		validate *validator.Validate
+		paymentService payments_service.Service
+		rentalService  rentals_service.Service
+		validate       *validator.Validate
 	}
 
 	WebhookRequest struct {
@@ -42,10 +45,11 @@ type (
 	}
 )
 
-func NewWebhookController(service payments_service.PaymentsRepo) *WebhookController {
+func NewWebhookController(paymentService payments_service.Service, rentalService rentals_service.Service) *WebhookController {
 	return &WebhookController{
-		service:  service,
-		validate: validator.New(),
+		paymentService: paymentService,
+		rentalService:  rentalService,
+		validate:       validator.New(),
 	}
 }
 
@@ -59,10 +63,21 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 
 	log.Print("Received webhook from Xendit:", request)
 
-	paymentId, _ := strconv.Atoi(request.ExternalID)
+	paymentIDandUserID := strings.Split(request.ExternalID, "-")
+
+	paymentId, _ := strconv.Atoi(paymentIDandUserID[0])
+	userId := paymentIDandUserID[1]
 
 	if request.Status == "PAID" {
-		err := ctrl.service.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
+		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
+		if err != nil {
+			log.Println("Failed to update payment status:", err.Error())
+			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+		}
+	}
+
+	if request.Status == "EXPIRED" {
+		err := ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, request.Status)
 		if err != nil {
 			log.Println("Failed to update payment status:", err.Error())
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))

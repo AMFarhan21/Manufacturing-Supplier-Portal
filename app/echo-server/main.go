@@ -2,6 +2,7 @@ package main
 
 import (
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/equipments_controller"
+	"Manufacturing-Supplier-Portal/app/echo-server/controller/payments_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/rentals_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/users_controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/controller/webhook_controller"
@@ -47,13 +48,14 @@ func main() {
 
 	paymentsRepository := payments_repository.NewPaymentsGormRepository(db)
 	paymentService := payments_service.NewPaymentsService(paymentsRepository)
+	paymentsController := payments_controller.NewPaymentsController(paymentService)
 
 	rentalsRepository := rentals_repository.NewRentalsGormRepository(db)
 	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository)
 	rentalsController := rentals_controller.NewRentalsController(rentalsService)
 
-	webHookController := webhook_controller.NewWebhookController(paymentService)
-	router.Router(e, secret, usersController, equipmentsController, rentalsController, webHookController)
+	webHookController := webhook_controller.NewWebhookController(paymentService, rentalsService)
+	router.Router(e, secret, usersController, equipmentsController, rentalsController, webHookController, paymentsController)
 
 	fmt.Println("Successfully connected to the server!")
 	e.Logger.Fatal(e.Start(":8000"))

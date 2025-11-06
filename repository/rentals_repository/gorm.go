@@ -7,9 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type RentalsGormRepository struct {
-	*gorm.DB
-}
+type (
+	RentalsGormRepository struct {
+		*gorm.DB
+	}
+
+	Status struct {
+		Status    string `json:"status"`
+		StartDate string `json:"start_date"`
+		EndDate   string `json:"end_date"`
+	}
+)
 
 func NewRentalsGormRepository(db *gorm.DB) *RentalsGormRepository {
 	return &RentalsGormRepository{
@@ -42,21 +50,19 @@ func (r RentalsGormRepository) GetRentalById(id int) (rentals_service.RentalEqui
 	}
 
 	return rentalEquipmentUser, nil
+}
 
-	// RentalEquipmentUser struct {
-	// 	RentalId      int       `json:"rental_id"`
-	// 	UserId        string    `json:"user_id"`
-	// 	EquipmentId   int       `json:"equipment_id"`
-	// 	RentalPeriod  string    `json:"rental_period"`
-	// 	StartDate     string    `json:"start_date"`
-	// 	EndDate       string    `json:"end_date"`
-	// 	Price         float64   `json:"price"`
-	// 	Status        string    `json:"status"`
-	// 	CreatedAt     time.Time `json:"created_at"`
-	// 	Description   string    `json:"description"`
-	// 	Username      string    `json:"username"`
-	// 	Email         string    `json:"email"`
-	// 	EquipmentName string    `json:"equipment_name"`
-	// 	Category      string    `json:"category"`
-	// }
+func (r RentalsGormRepository) UpdateStatusAndDate(id int, status, startDate, endDate string) error {
+	ctx := context.Background()
+	err := r.DB.WithContext(ctx).Where("id=?", id).Updates(Status{
+		Status:    status,
+		StartDate: startDate,
+		EndDate:   endDate,
+	}).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

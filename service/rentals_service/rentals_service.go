@@ -19,6 +19,7 @@ type Service interface {
 	CreateRental(data Rentals) (RentalsWithInvoiceUrl, error)
 	createPayment(rental Rentals) (payments_service.Payments, error)
 	rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
+	UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error
 }
 
 func NewRentalsService(rentalRepo RentalsRepo, equipmentRepo equipments_service.EquipmentsRepo, xenditRepo xendit_service.XenditRepo, paymentsRepository payments_service.PaymentsRepo) Service {
@@ -31,23 +32,7 @@ func NewRentalsService(rentalRepo RentalsRepo, equipmentRepo equipments_service.
 }
 
 func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error) {
-	var period time.Duration
-
-	switch data.RentalPeriod {
-	case "day":
-		period = 24
-	case "week":
-		period = 24 * 7
-	case "month":
-		period = 24 * 30
-	case "year":
-		period = 24 * 365
-	}
-
 	now := time.Now()
-
-	data.StartDate = now.Format("2006-01-02")
-	data.EndDate = now.Add(time.Hour * period).Format("2006-01-02")
 	data.CreatedAt = now
 
 	equipment, err := s.equipmentRepo.GetById(data.EquipmentId)
@@ -68,7 +53,7 @@ func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error
 	}
 
 	data.Price = price
-	data.Status = "pending"
+	data.Status = "PENDING"
 
 	rental, err := s.rentalRepo.Create(data)
 	if err != nil {
@@ -126,4 +111,50 @@ func (s RentalsService) rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipment
 	rentalWithInvoiceUrl.InvoiceUrl = invoiceUrl
 
 	return rentalWithInvoiceUrl, nil
+}
+
+func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, paymentStatus string) error {
+	payment, err := s.paymentsRepository.GetById(paymentId, userId)
+	if err != nil {
+		return err
+	}
+
+	rental, err := s.rentalRepo.GetRentalById(payment.RentalId)
+	if err != nil {
+		return err
+	}
+
+	var status string
+	var period time.Duration
+	var startDate string
+	var endDate string
+
+	if paymentStatus == "PAID" {
+		status = "ACTIVE"
+		switch rental.RentalPeriod {
+		case "day":
+			period = 24
+		case "week":
+			period = 24 * 7
+		case "month":
+			period = 24 * 30
+		case "year":
+			period = 24 * 365
+		}
+
+		now := time.Now()
+		startDate = now.Format("2006-01-02")
+		endDate = now.Add(time.Hour * period).Format("2006-01-02")
+		err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, true)
+		if err != nil {
+			return err
+		}
+
+	} else if paymentStatus == "EXPIRED" {
+		startDate = ""
+		endDate = ""
+		status = "CANCELLED"
+	}
+
+	return s.rentalRepo.UpdateStatusAndDate(payment.RentalId, status, startDate, endDate)
 }

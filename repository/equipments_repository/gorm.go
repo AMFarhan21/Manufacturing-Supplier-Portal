@@ -80,3 +80,17 @@ func (r *EquipmentsGormRepository) Delete(id int) error {
 
 	return nil
 }
+
+func (r *EquipmentsGormRepository) UpdateStatus(id int, status bool) error {
+	ctx := context.Background()
+	row := r.DB.WithContext(ctx).Where("id=?", id).Update("status", status)
+	if row.RowsAffected == 0 {
+		return errors.New("equipment id not found")
+	}
+
+	if err := row.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
