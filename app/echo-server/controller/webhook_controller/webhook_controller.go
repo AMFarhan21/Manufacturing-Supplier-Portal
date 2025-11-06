@@ -62,7 +62,7 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 	paymentId, _ := strconv.Atoi(request.ExternalID)
 
 	if request.Status == "PAID" {
-		err := ctrl.service.UpdateStatus(paymentId, request.Status)
+		err := ctrl.service.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
 		if err != nil {
 			log.Println("Failed to update payment status:", err.Error())
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))

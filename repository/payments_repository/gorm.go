@@ -7,9 +7,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type PaymentsGormRepository struct {
-	*gorm.DB
-}
+type (
+	PaymentsGormRepository struct {
+		*gorm.DB
+	}
+
+	Updates struct {
+		Status        string `json:"status"`
+		PaymentMethod string `json:"payment_method"`
+	}
+)
 
 func NewPaymentsGormRepository(db *gorm.DB) *PaymentsGormRepository {
 	return &PaymentsGormRepository{
@@ -38,9 +45,12 @@ func (r *PaymentsGormRepository) GetById(id int, userId string) (payments_servic
 	return payment, nil
 }
 
-func (r *PaymentsGormRepository) UpdateStatus(id int, status string) error {
+func (r *PaymentsGormRepository) UpdateStatusAndMethod(id int, status, method string) error {
 	ctx := context.Background()
-	err := r.DB.WithContext(ctx).Where("id=?", id).Update("status", status).Error
+	err := r.DB.WithContext(ctx).Where("id=?", id).Updates(Updates{
+		Status:        status,
+		PaymentMethod: method,
+	}).Error
 	if err != nil {
 		return err
 	}
