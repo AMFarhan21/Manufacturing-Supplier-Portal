@@ -49,7 +49,7 @@ func Router(
 	equipments.PUT("/:id", equipmentsController.UpdateEquipment, adminAccess)
 	equipments.DELETE("/:id", equipmentsController.DeleteEquipment, adminAccess)
 
-	e.POST("/webhook/handler", webHookController.HandleWebhook, middlewares, userAccess)
+	e.POST("/webhook/handler", webHookController.HandleWebhook)
 
 	rentals := e.Group("api/rentals", middlewares)
 	rentals.POST("", rentalsController.CreateRental, userAccess)
