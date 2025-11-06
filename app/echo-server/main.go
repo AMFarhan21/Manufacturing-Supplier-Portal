@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 	secret := os.Getenv("SECRET")
 
 	e := echo.New()
+	e.Use(middleware.Recover())
 
 	xenditApi := os.Getenv("XENDIT_API")
 	xenditUrl := os.Getenv("XENDIT_URL")
