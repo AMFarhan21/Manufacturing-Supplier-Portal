@@ -4,6 +4,7 @@ import (
 	"Manufacturing-Supplier-Portal/service/rentals_service"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/AMFarhan21/fres"
 	"github.com/go-playground/validator/v10"
@@ -35,12 +36,12 @@ func (ctrl RentalsController) CreateRental(c echo.Context) error {
 	var request RentalsInput
 
 	if err := c.Bind(&request); err != nil {
-		log.Print("Error on CreateEquipment request body:", err.Error())
+		log.Print("Error on CreateRental request body:", err.Error())
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
 	if err := ctrl.validate.Struct(request); err != nil {
-		log.Print("Error on CreateEquipment validation:", err.Error())
+		log.Print("Error on CreateRental validation:", err.Error())
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
@@ -50,6 +51,14 @@ func (ctrl RentalsController) CreateRental(c echo.Context) error {
 		RentalPeriod: request.RentalPeriod,
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), "you dont have enough money to rent this equipment") {
+			log.Print("Error on CreateRental request body:", err.Error())
+			return c.JSON(http.StatusBadRequest, fres.DefaultErrorResponse{
+				Success: false,
+				Message: err.Error(),
+				Error:   http.StatusBadRequest,
+			})
+		}
 		log.Print("Error on create rental server:", err.Error())
 		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 	}

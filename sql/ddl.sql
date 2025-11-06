@@ -70,4 +70,17 @@ INSERT INTO categories (name, description) VALUES
 ('Wales', 'Wales, atau dikenal sebagai vibro roller, adalah alat berat yang menggunakan getaran untuk memadatkan tanah atau aspal. Wales efektif dalam menciptakan permukaan yang padat dan kuat.'),
 ('Scraper', 'Scraper digunakan untuk mengumpulkan, mengangkat, dan memindahkan material seperti tanah atau kerikil dalam jumlah besar. Scraper sangat efisien dalam pekerjaan penggalian dan pemindahan material.')
 ;
-
+INSERT INTO equipments (id, name, category_id, description, price_per_day, price_per_week, price_per_month, price_per_year, available) VALUES
+(1, 'Toyota 3 Ton Forklift', 1, 'Forklift diesel untuk gudang & industri', 900000, 6000000, 18000000, 185000000, true),
+(2, 'Mitsubishi 5 Ton Forklift (terupdate 5)', 1, 'Cocok untuk angkat material berat outdoor (terupdate 6)', 1600000, 9500000, 28000000, 300000000, false),
+(3, 'Tadano 25 Ton Truck Crane', 2, 'Crane mobile untuk proyek konstruksi', 6500000, 40000000, 120000000, 1200000000, true),
+(4, 'Kato 50 Ton Crane', 2, 'Crane kapasitas menengah untuk proyek besar', 9000000, 58000000, 180000000, 1800000000, true),
+(5, 'Sakai TW500W', 3, 'Roller tandem untuk finishing aspal', 1800000, 11000000, 32000000, 320000000, true),
+(6, 'Caterpillar D6R', 4, 'Bulldozer pengurugan skala besar', 5500000, 35000000, 100000000, 1000000000, true),
+(7, 'Komatsu D85EX Shovel', 5, 'Dozer dengan bucket untuk material loose', 6000000, 38000000, 115000000, 1150000000, true),
+(8, 'Caterpillar 950H', 6, 'Loader serbaguna untuk material tambang', 4100000, 26000000, 78000000, 780000000, true),
+(9, 'Caterpillar 140K', 7, 'Grader untuk jalan & land clearing', 4800000, 30000000, 90000000, 900000000, false),
+(10, 'Bomag BW212D', 8, 'Compactor tanah vibratory 12 ton', 2900000, 18000000, 55000000, 550000000, false),
+(11, 'Wacker Neuson BS50-2', 9, 'Tamping rammer untuk pemadatan spot', 200000, 1000000, 3000000, 30000000, true),
+(12, 'Caterpillar 627K', 10, 'Scraper tandem loader', 8500000, 55000000, 160000000, 1600000000, true)
+;

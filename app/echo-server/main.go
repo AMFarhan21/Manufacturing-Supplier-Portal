@@ -56,7 +56,7 @@ func main() {
 	rentalHistoriesRepository := rental_histories_repository.NewRentalHistoriesGormRepository(db)
 
 	rentalsRepository := rentals_repository.NewRentalsGormRepository(db)
-	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository, rentalHistoriesRepository)
+	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository, rentalHistoriesRepository, usersRepository)
 	rentalsController := rentals_controller.NewRentalsController(rentalsService)
 
 	webHookController := webhook_controller.NewWebhookController(paymentService, rentalsService)

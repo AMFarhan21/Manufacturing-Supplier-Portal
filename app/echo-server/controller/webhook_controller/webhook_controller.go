@@ -71,6 +71,7 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
 	log.Println("PAYMENT_ID:", paymentId)
 	log.Println("USER_ID:", userId)
+	log.Println("PAYMENTIDANDUSERID:", paymentIDandUserID)
 	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
 
 	if request.Status == "PAID" {

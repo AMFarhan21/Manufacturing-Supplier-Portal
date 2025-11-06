@@ -4,6 +4,7 @@ import (
 	"Manufacturing-Supplier-Portal/service/equipments_service"
 	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/rental_histories_service"
+	"Manufacturing-Supplier-Portal/service/users_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
 	"log"
@@ -16,6 +17,7 @@ type RentalsService struct {
 	xenditRepo          xendit_service.XenditRepo
 	paymentsRepo        payments_service.PaymentsRepo
 	rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo
+	userRepo            users_service.UsersRepo
 }
 
 type Service interface {
@@ -31,6 +33,7 @@ func NewRentalsService(
 	xenditRepo xendit_service.XenditRepo,
 	paymentsRepo payments_service.PaymentsRepo,
 	rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo,
+	userRepo users_service.UsersRepo,
 ) Service {
 	return &RentalsService{
 		rentalRepo:          rentalRepo,
@@ -38,6 +41,7 @@ func NewRentalsService(
 		xenditRepo:          xenditRepo,
 		paymentsRepo:        paymentsRepo,
 		rentalHistoriesRepo: rentalHistoriesRepo,
+		userRepo:            userRepo,
 	}
 }
 
@@ -60,6 +64,14 @@ func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error
 		price = equipment.PricePerMonth
 	case "year":
 		price = equipment.PricePerYear
+	}
+
+	user, err := s.userRepo.FindById(data.UserId)
+	if err != nil {
+		return RentalsWithInvoiceUrl{}, err
+	}
+	if user.DepositAmount < price {
+		return RentalsWithInvoiceUrl{}, errors.New("you dont have enough money to rent this equipment")
 	}
 
 	data.Price = price
