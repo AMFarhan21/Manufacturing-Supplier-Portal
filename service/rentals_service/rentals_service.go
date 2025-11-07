@@ -7,7 +7,6 @@ import (
 	"Manufacturing-Supplier-Portal/service/users_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
-	"log"
 	"time"
 )
 
@@ -225,15 +224,6 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 		}
 	}
 
-	log.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
-	log.Println("STATUS:", status)
-	log.Println("PAYMENT_ID:", paymentId)
-	log.Println("USER_ID:", userId)
-	log.Println("START_DATE:", startDate)
-	log.Println("END_DATE:", endDate)
-	log.Println("RENTAL_ID:", payment.RentalId)
-	log.Println("RentalId:", rental.RentalId)
-	log.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
 	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
 }
 

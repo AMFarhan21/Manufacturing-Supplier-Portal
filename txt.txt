@@ -1,0 +1,14 @@
+mockgen -source service/rentals_service/rentals_repo.go -destination service/rentals_service/mock/rentals_repo.go
+mockgen -source service/equipments_service/equipments_repo.go -destination service/equipments_service/mock/equipments_repo.go
+mockgen -source service/users_service/users_repo.go -destination service/users_service/mock/users_repo.go
+mockgen -source service/rental_histories_service/rental_histories_repo.go -destination service/rental_histories_service/mock/rental_histories_repo.go
+mockgen -source service/xendit_service/xendit_repo.go -destination service/xendit_service/mock/xendit_repo.go
+mockgen -source service/payments_service/payments_repo.go -destination service/payments_service/mock/payments_repo.go
+
+
+test-service:
+	go test -v ./service/... -coverprofile=coverage.out -cover -failfast
+test-service-coverage:
+	go test -v $(go list ./service/... | grep -v '/mock') -coverprofile=coverage.out -cover -failfast && \
+	go tool cover -html=coverage.out -o cover.html && \
+	open cover.html

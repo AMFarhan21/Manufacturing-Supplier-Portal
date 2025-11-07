@@ -68,12 +68,6 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 	paymentId, _ := strconv.Atoi(paymentIDandUserID[0])
 	userId := paymentIDandUserID[1]
 
-	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
-	log.Println("PAYMENT_ID:", paymentId)
-	log.Println("USER_ID:", userId)
-	log.Println("PAYMENTIDANDUSERID:", paymentIDandUserID)
-	log.Printf("------------------------------------------%s-----------------------------------", "Webhook Controller")
-
 	if request.Status == "PAID" {
 		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
 		if err != nil {

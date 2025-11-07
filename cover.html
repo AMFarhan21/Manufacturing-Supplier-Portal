@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>equipments_service: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">Manufacturing-Supplier-Portal/service/equipments_service/equipments_service.go (0.0%)</option>
+				
+				<option value="file1">Manufacturing-Supplier-Portal/service/payments_service/payments_service.go (100.0%)</option>
+				
+				<option value="file2">Manufacturing-Supplier-Portal/service/rentals_service/rentals_service.go (21.2%)</option>
+				
+				<option value="file3">Manufacturing-Supplier-Portal/service/users_service/users_service.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package equipments_service
+
+type EquipmentsService struct {
+        repo EquipmentsRepo
+}
+
+type Service interface {
+        CreateEquipment(data Equipments) (Equipments, error)
+        GetAllEquipments() ([]Equipments, error)
+        GetEquipmentById(id int) (Equipments, error)
+        UpdateEquipment(id int, data Equipments) (Equipments, error)
+        DeleteEquipment(id int) error
+}
+
+func NewEquipmentsService(repo EquipmentsRepo) Service <span class="cov0" title="0">{
+        return &amp;EquipmentsService{
+                repo: repo,
+        }
+}</span>
+
+func (s EquipmentsService) CreateEquipment(data Equipments) (Equipments, error) <span class="cov0" title="0">{
+        return s.repo.Create(data)
+}</span>
+func (s EquipmentsService) GetAllEquipments() ([]Equipments, error) <span class="cov0" title="0">{
+        return s.repo.GetAll()
+}</span>
+func (s EquipmentsService) GetEquipmentById(id int) (Equipments, error) <span class="cov0" title="0">{
+        return s.repo.GetById(id)
+}</span>
+func (s EquipmentsService) UpdateEquipment(id int, data Equipments) (Equipments, error) <span class="cov0" title="0">{
+        return s.repo.Update(id, data)
+}</span>
+func (s EquipmentsService) DeleteEquipment(id int) error <span class="cov0" title="0">{
+        return s.repo.Delete(id)
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package payments_service
+
+type PaymentsService struct {
+        repo PaymentsRepo
+}
+
+type Service interface {
+        Create(data Payments) (Payments, error)
+        GetById(id int, userId string) (Payments, error)
+        UpdateStatusAndMethod(id int, status, method string) error
+        BookingReport() ([]BookingsReport, error)
+}
+
+func NewPaymentsService(repo PaymentsRepo) Service <span class="cov8" title="1">{
+        return &amp;PaymentsService{
+                repo: repo,
+        }
+}</span>
+
+func (s PaymentsService) Create(data Payments) (Payments, error) <span class="cov8" title="1">{
+        return s.repo.Create(data)
+}</span>
+func (s PaymentsService) GetById(id int, userId string) (Payments, error) <span class="cov8" title="1">{
+        return s.repo.GetById(id, userId)
+}</span>
+func (s PaymentsService) UpdateStatusAndMethod(id int, status, method string) error <span class="cov8" title="1">{
+        return s.repo.UpdateStatusAndMethod(id, status, method)
+}</span>
+func (s PaymentsService) BookingReport() ([]BookingsReport, error) <span class="cov8" title="1">{
+        return s.repo.BookingReport()
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package rentals_service
+
+import (
+        "Manufacturing-Supplier-Portal/service/equipments_service"
+        "Manufacturing-Supplier-Portal/service/payments_service"
+        "Manufacturing-Supplier-Portal/service/rental_histories_service"
+        "Manufacturing-Supplier-Portal/service/users_service"
+        "Manufacturing-Supplier-Portal/service/xendit_service"
+        "errors"
+        "time"
+)
+
+type RentalsService struct {
+        rentalRepo          RentalsRepo
+        equipmentRepo       equipments_service.EquipmentsRepo
+        xenditRepo          xendit_service.XenditRepo
+        paymentsRepo        payments_service.PaymentsRepo
+        rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo
+        userRepo            users_service.UsersRepo
+}
+
+type Service interface {
+        CreateRental(data Rentals) (RentalsWithInvoiceUrl, error)
+        createPayment(rental Rentals) (payments_service.Payments, error)
+        rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
+        UpdateStatusAndDate(paymentId int, userId, status string) error
+        GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error)
+        SimulateAutomaticUpdateRentalStatus() error
+}
+
+func NewRentalsService(
+        rentalRepo RentalsRepo,
+        equipmentRepo equipments_service.EquipmentsRepo,
+        xenditRepo xendit_service.XenditRepo,
+        paymentsRepo payments_service.PaymentsRepo,
+        rentalHistoriesRepo rental_histories_service.RentalHistoriesRepo,
+        userRepo users_service.UsersRepo,
+) Service <span class="cov8" title="1">{
+        return &amp;RentalsService{
+                rentalRepo:          rentalRepo,
+                equipmentRepo:       equipmentRepo,
+                xenditRepo:          xenditRepo,
+                paymentsRepo:        paymentsRepo,
+                rentalHistoriesRepo: rentalHistoriesRepo,
+                userRepo:            userRepo,
+        }
+}</span>
+
+func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error) <span class="cov8" title="1">{
+        now := time.Now()
+        data.CreatedAt = now
+
+        equipment, err := s.equipmentRepo.GetById(data.EquipmentId)
+        if err != nil </span><span class="cov8" title="1">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+
+        <span class="cov8" title="1">if !*equipment.Available </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, errors.New("this equipment is not available")
+        }</span>
+
+        <span class="cov8" title="1">var price float64
+        switch data.RentalPeriod </span>{
+        case "day":<span class="cov0" title="0">
+                price = equipment.PricePerDay</span>
+        case "week":<span class="cov0" title="0">
+                price = equipment.PricePerWeek</span>
+        case "month":<span class="cov0" title="0">
+                price = equipment.PricePerMonth</span>
+        case "year":<span class="cov0" title="0">
+                price = equipment.PricePerYear</span>
+        }
+
+        <span class="cov8" title="1">user, err := s.userRepo.FindById(data.UserId)
+        if err != nil </span><span class="cov8" title="1">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+        <span class="cov8" title="1">if user.DepositAmount &lt; price </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, errors.New("you dont have enough money to rent this equipment")
+        }</span>
+
+        <span class="cov8" title="1">data.Price = price
+        data.Status = "PENDING"
+
+        rental, err := s.rentalRepo.Create(data)
+        if err != nil </span><span class="cov8" title="1">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+        <span class="cov8" title="1">_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+                RentalId:  rental.Id,
+                UserId:    rental.UserId,
+                Status:    rental.Status,
+                CreatedAt: rental.CreatedAt,
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+
+        <span class="cov0" title="0">payment, err := s.createPayment(rental)
+        if err != nil </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+
+        <span class="cov0" title="0">rentalEquipmentUser, err := s.rentalRepo.GetRentalById(rental.Id)
+        if err != nil </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+
+        <span class="cov0" title="0">rentalWithInvoice, err := s.rentalWithInvoiceUrl(rentalEquipmentUser, rental, payment.Id)
+        if err != nil </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, err
+        }</span>
+
+        <span class="cov0" title="0">return rentalWithInvoice, nil</span>
+}
+
+func (s RentalsService) createPayment(rental Rentals) (payments_service.Payments, error) <span class="cov0" title="0">{
+        var dataPayments payments_service.Payments
+        dataPayments.UserId = rental.UserId
+        dataPayments.RentalId = rental.Id
+        dataPayments.Amount = rental.Price
+        dataPayments.Status = "PENDING"
+        dataPayments.CreatedAt = time.Now()
+        payment, err := s.paymentsRepo.Create(dataPayments)
+        if err != nil </span><span class="cov0" title="0">{
+                return payments_service.Payments{}, err
+        }</span>
+
+        <span class="cov0" title="0">return payment, nil</span>
+}
+
+func (s RentalsService) rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error) <span class="cov0" title="0">{
+        invoiceUrl, err := s.xenditRepo.XenditInvoiceUrl(rentalEquipmentUser.UserId, rentalEquipmentUser.Description, rentalEquipmentUser.Username, rentalEquipmentUser.Email, rentalEquipmentUser.EquipmentName, rentalEquipmentUser.Category, paymentId, rental.Price)
+        if err != nil || invoiceUrl == "" </span><span class="cov0" title="0">{
+                return RentalsWithInvoiceUrl{}, errors.New("failed to create invoice URL, try again")
+        }</span>
+        <span class="cov0" title="0">var rentalWithInvoiceUrl RentalsWithInvoiceUrl
+        rentalWithInvoiceUrl.Id = rental.Id
+        rentalWithInvoiceUrl.UserId = rental.UserId
+        rentalWithInvoiceUrl.EquipmentId = rental.EquipmentId
+        rentalWithInvoiceUrl.RentalPeriod = rental.RentalPeriod
+        rentalWithInvoiceUrl.StartDate = rental.StartDate
+        rentalWithInvoiceUrl.EndDate = rental.EndDate
+        rentalWithInvoiceUrl.Price = rental.Price
+        rentalWithInvoiceUrl.Status = rental.Status
+        rentalWithInvoiceUrl.CreatedAt = rental.CreatedAt
+        rentalWithInvoiceUrl.InvoiceUrl = invoiceUrl
+
+        return rentalWithInvoiceUrl, nil</span>
+}
+
+func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string) error <span class="cov0" title="0">{
+        payment, err := s.paymentsRepo.GetById(paymentId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">rental, err := s.rentalRepo.GetRentalById(payment.RentalId)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">var period time.Duration
+        var startDate time.Time
+        var endDate time.Time
+
+        switch status </span>{
+        case "BOOKED":<span class="cov0" title="0">
+                switch rental.RentalPeriod </span>{
+                case "day":<span class="cov0" title="0">
+                        period = 24</span>
+                case "week":<span class="cov0" title="0">
+                        period = 24 * 7</span>
+                case "month":<span class="cov0" title="0">
+                        period = 24 * 30</span>
+                case "year":<span class="cov0" title="0">
+                        period = 24 * 365</span>
+                }
+
+                <span class="cov0" title="0">now := time.Now().Add(time.Minute * 1)
+                // startDate = now.Format("2006-01-02")
+                // endDate = now.Add(time.Hour * period).Format("2006-01-02")
+                startDate = now
+                endDate = now.Add(time.Hour * period)
+                err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, false)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">_, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+                        RentalId:  rental.RentalId,
+                        UserId:    userId,
+                        Status:    status,
+                        CreatedAt: rental.CreatedAt,
+                })
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                // search for users
+                <span class="cov0" title="0">user, err := s.userRepo.FindById(userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                // substract user deposit
+                <span class="cov0" title="0">amount := user.DepositAmount - payment.Amount
+
+                // update user deposit amount
+                _, err = s.userRepo.UpdateDepositAmount(userId, amount)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+        case "CANCELLED":<span class="cov0" title="0">
+                _, err = s.rentalHistoriesRepo.CreateRentalHistory(rental_histories_service.RentalHistories{
+                        RentalId:  rental.RentalId,
+                        UserId:    userId,
+                        Status:    status,
+                        CreatedAt: rental.CreatedAt,
+                })
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov0" title="0">return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)</span>
+}
+
+func (s RentalsService) GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error) <span class="cov0" title="0">{
+        return s.rentalHistoriesRepo.GetAll(userId)
+}</span>
+
+func (s RentalsService) SimulateAutomaticUpdateRentalStatus() error <span class="cov0" title="0">{
+        return s.rentalRepo.SimulateAutomaticUpdateRentalStatus()
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package users_service
+
+import (
+        "errors"
+        "time"
+
+        "github.com/golang-jwt/jwt/v5"
+        "github.com/google/uuid"
+        "golang.org/x/crypto/bcrypt"
+)
+
+type (
+        UsersService struct {
+                repo      UsersRepo
+                jwtSecret string
+        }
+        Service interface {
+                RegisterUser(data Users) (Users, error)
+                Login(email, password string) (string, error)
+                FindUserById(id string) (UsersResponse, error)
+                GetAll() ([]UsersResponse, error)
+                TopUp(userId string, amount float64) (float64, error)
+        }
+)
+
+func NewUsersService(repo UsersRepo, secret string) Service <span class="cov0" title="0">{
+        return &amp;UsersService{
+                repo:      repo,
+                jwtSecret: secret,
+        }
+}</span>
+
+func (s UsersService) RegisterUser(data Users) (Users, error) <span class="cov0" title="0">{
+        user, _ := s.repo.FindByEmail(data.Email)
+        if user.Email != "" </span><span class="cov0" title="0">{
+                return Users{}, errors.New("email already exists")
+        }</span>
+
+        <span class="cov0" title="0">hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return Users{}, err
+        }</span>
+
+        <span class="cov0" title="0">data.Id = uuid.NewString()
+        data.Password = string(hashedPassword)
+
+        return s.repo.Register(data)</span>
+}
+
+func (s UsersService) Login(email, password string) (string, error) <span class="cov0" title="0">{
+        user, err := s.repo.FindByEmail(email)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.New("invalid email or password")
+        }</span>
+
+        <span class="cov0" title="0">err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.New("invalid email or password")
+        }</span>
+
+        <span class="cov0" title="0">type MapClaims struct {
+                Id   string `json:"id"`
+                Role string `json:"role"`
+                *jwt.RegisteredClaims
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, MapClaims{
+                Id:   user.Id,
+                Role: user.Role,
+                RegisteredClaims: &amp;jwt.RegisteredClaims{
+                        IssuedAt:  jwt.NewNumericDate(time.Now()),
+                        ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+                },
+        })
+
+        signedToken, err := token.SignedString([]byte(s.jwtSecret))
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return signedToken, nil</span>
+}
+
+func (s UsersService) FindUserById(id string) (UsersResponse, error) <span class="cov0" title="0">{
+        user, err := s.repo.FindById(id)
+        if err != nil </span><span class="cov0" title="0">{
+                return UsersResponse{}, err
+        }</span>
+
+        <span class="cov0" title="0">return user, nil</span>
+}
+
+func (s UsersService) GetAll() ([]UsersResponse, error) <span class="cov0" title="0">{
+        return s.repo.GetAll()
+}</span>
+
+func (s UsersService) TopUp(userId string, amount float64) (float64, error) <span class="cov0" title="0">{
+        user, err := s.repo.FindById(userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">amount = user.DepositAmount + amount
+
+        return s.repo.UpdateDepositAmount(userId, amount)</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
