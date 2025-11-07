@@ -58,9 +58,9 @@ func (r *PaymentsGormRepository) UpdateStatusAndMethod(id int, status, method st
 	return nil
 }
 
-func (r *PaymentsGormRepository) BookingReport() (payments_service.BookingsReport, error) {
+func (r *PaymentsGormRepository) BookingReport() ([]payments_service.BookingsReport, error) {
 	ctx := context.Background()
-	var bookingReport payments_service.BookingsReport
+	var bookingReport []payments_service.BookingsReport
 	err := r.DB.WithContext(ctx).
 		Select("equipments.id, equipments.name, SUM(payments.amount) as total_income, COUNT(payments.id) as total_booking").
 		Joins("LEFT JOIN rentals ON rentals.id = payments.rental_id").
@@ -70,7 +70,7 @@ func (r *PaymentsGormRepository) BookingReport() (payments_service.BookingsRepor
 		Order("equipments.id").
 		Scan(&bookingReport).Error
 	if err != nil {
-		return payments_service.BookingsReport{}, err
+		return nil, err
 	}
 
 	return bookingReport, nil
