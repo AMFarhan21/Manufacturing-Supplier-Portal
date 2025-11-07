@@ -3,6 +3,7 @@ package rentals_repository
 import (
 	"Manufacturing-Supplier-Portal/service/rentals_service"
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -13,9 +14,9 @@ type (
 	}
 
 	Status struct {
-		Status    string `json:"status"`
-		StartDate string `json:"start_date"`
-		EndDate   string `json:"end_date"`
+		Status    string    `json:"status"`
+		StartDate time.Time `json:"start_date"`
+		EndDate   time.Time `json:"end_date"`
 	}
 )
 
@@ -52,7 +53,7 @@ func (r RentalsGormRepository) GetRentalById(id int) (rentals_service.RentalEqui
 	return rentalEquipmentUser, nil
 }
 
-func (r RentalsGormRepository) UpdateStatusAndDateRepo(id int, status, startDate, endDate string) error {
+func (r RentalsGormRepository) UpdateStatusAndDateRepo(id int, status string, startDate, endDate time.Time) error {
 	ctx := context.Background()
 	err := r.DB.WithContext(ctx).Where("id=?", id).Updates(Status{
 		Status:    status,

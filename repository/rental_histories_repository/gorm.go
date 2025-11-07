@@ -28,3 +28,13 @@ func (r *RentalHistoriesGormRepository) CreateRentalHistory(data rental_historie
 
 	return data, nil
 }
+
+func (r *RentalHistoriesGormRepository) GetAll(userId string) ([]rental_histories_service.RentalHistories, error) {
+	ctx := context.Background()
+	var rentals_history []rental_histories_service.RentalHistories
+	err := r.DB.WithContext(ctx).Where("user_id=?", userId).Find(&rentals_history).Error
+	if err != nil {
+		return nil, err
+	}
+	return rentals_history, nil
+}

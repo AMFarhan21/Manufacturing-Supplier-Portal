@@ -1,7 +1,7 @@
 package equipments_service
 
 type Equipments struct {
-	Id            int     `json:"id"`
+	Id            int     `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name          string  `json:"name"`
 	CategoryId    int     `json:"category_id"`
 	Description   string  `json:"description"`

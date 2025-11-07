@@ -75,3 +75,16 @@ func (ctrl RentalsController) CreateRental(c echo.Context) error {
 	log.Print("Successfully create a rental")
 	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(rental))
 }
+
+func (ctrl RentalsController) GetAllRentalHistoriesByUserId(c echo.Context) error {
+	userId := c.Get("id").(string)
+	rentalHistories, err := ctrl.service.GetAllRentalHistoriesByUserId(userId)
+
+	if err != nil {
+		log.Print("Error on GetAllRentalHistories server:", err.Error())
+		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	}
+
+	log.Print("Successfully get all rental histories")
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(rentalHistories))
+}

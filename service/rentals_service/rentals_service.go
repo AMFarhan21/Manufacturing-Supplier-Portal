@@ -25,6 +25,7 @@ type Service interface {
 	createPayment(rental Rentals) (payments_service.Payments, error)
 	rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
 	UpdateStatusAndDate(paymentId int, userId, status string) error
+	GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error)
 }
 
 func NewRentalsService(
@@ -160,8 +161,8 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 	}
 
 	var period time.Duration
-	var startDate string
-	var endDate string
+	var startDate time.Time
+	var endDate time.Time
 
 	switch status {
 	case "BOOKED":
@@ -176,9 +177,11 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 			period = 24 * 365
 		}
 
-		now := time.Now().Add(time.Hour * 24)
-		startDate = now.Format("2006-01-02")
-		endDate = now.Add(time.Hour * period).Format("2006-01-02")
+		now := time.Now().Add(time.Minute * 1)
+		// startDate = now.Format("2006-01-02")
+		// endDate = now.Add(time.Hour * period).Format("2006-01-02")
+		startDate = now
+		endDate = now.Add(time.Hour * period)
 		err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, false)
 		if err != nil {
 			return err
@@ -231,4 +234,8 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 	log.Println("RentalId:", rental.RentalId)
 	log.Printf("------------------------------------------%s-----------------------------------", "Rentals Service")
 	return s.rentalRepo.UpdateStatusAndDateRepo(payment.RentalId, status, startDate, endDate)
+}
+
+func (s RentalsService) GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error) {
+	return s.rentalHistoriesRepo.GetAll(userId)
 }
