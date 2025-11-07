@@ -120,8 +120,25 @@ AFTER UPDATE ON rentals
 FOR EACH ROW
 EXECUTE FUNCTION fn_insert_rental_histories_status();
 
+CREATE OR REPLACE FUNCTION fn_update_equipment_availability()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status = 'COMPLETED' THEN
+        UPDATE equipments SET available = true WHERE id = NEW.equipment_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_equipment_availablity
+AFTER UPDATE ON rentals
+FOR EACH ROW
+EXECUTE FUNCTION fn_update_equipment_availability();
+
 
 -- DROP TRIGGER IF EXISTS trg_update_rental_status ON rentals;
 -- DROP TRIGGER IF EXISTS trg_insert_rental_histories_status ON rentals;
+-- DROP TRIGGER IF EXISTS trg_update_equipment_availablity ON rentals;
 -- DROP FUNCTION IF EXISTS fn_update_rental_status();
 -- DROP FUNCTION IF EXISTS fn_insert_rental_histories_status();
+-- DROP FUNCTION IF EXISTS fn_update_equipment_availability();

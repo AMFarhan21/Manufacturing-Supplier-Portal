@@ -81,7 +81,7 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 		}
 
-		err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "ACTIVE")
+		err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "BOOKED")
 		if err != nil {
 			log.Println("Failed to update payment status:", err.Error())
 			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
