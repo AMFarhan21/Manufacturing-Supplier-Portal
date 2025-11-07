@@ -117,8 +117,8 @@ BEGIN
     ELSIF NEW.status = 'COMPLETED' THEN
         INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
         (NEW.id, NEW.user_id, 'COMPLETED', NOW());
-        RETURN NEW;
     END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

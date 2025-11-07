@@ -55,6 +55,7 @@ func Router(
 
 	payments := e.Group("/api/payments", middlewares)
 	payments.GET("/:id", paymentsController.GetPaymentsById, userAccess)
+	payments.GET("/bookingreport", paymentsController.BookingReport, adminAccess)
 
 	e.POST("/webhook/handler", webHookController.HandleWebhook)
 

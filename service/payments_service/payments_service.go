@@ -8,6 +8,7 @@ type Service interface {
 	Create(data Payments) (Payments, error)
 	GetById(id int, userId string) (Payments, error)
 	UpdateStatusAndMethod(id int, status, method string) error
+	BookingReport() (BookingsReport, error)
 }
 
 func NewPaymentsService(repo PaymentsRepo) Service {
@@ -24,4 +25,7 @@ func (s PaymentsService) GetById(id int, userId string) (Payments, error) {
 }
 func (s PaymentsService) UpdateStatusAndMethod(id int, status, method string) error {
 	return s.repo.UpdateStatusAndMethod(id, status, method)
+}
+func (s PaymentsService) BookingReport() (BookingsReport, error) {
+	return s.repo.BookingReport()
 }
