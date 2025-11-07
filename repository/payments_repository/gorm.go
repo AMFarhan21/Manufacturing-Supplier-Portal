@@ -34,6 +34,17 @@ func (r *PaymentsGormRepository) Create(data payments_service.Payments) (payment
 	return data, nil
 }
 
+func (r *PaymentsGormRepository) GetAll(userId string) ([]payments_service.Payments, error) {
+	ctx := context.Background()
+	var payments []payments_service.Payments
+	err := r.DB.WithContext(ctx).Where("user_id=?", userId).Find(&payments).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return payments, nil
+}
+
 func (r *PaymentsGormRepository) GetById(id int, userId string) (payments_service.Payments, error) {
 	ctx := context.Background()
 	var payment payments_service.Payments

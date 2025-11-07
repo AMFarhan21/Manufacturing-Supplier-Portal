@@ -54,6 +54,7 @@ func Router(
 	equipments.DELETE("/:id", equipmentsController.DeleteEquipment, adminAccess)
 
 	payments := e.Group("/api/payments", middlewares)
+	payments.GET("", paymentsController.GetAllPaymentsByUserId, userAccess)
 	payments.GET("/:id", paymentsController.GetPaymentsById, userAccess)
 	payments.GET("/bookingreport", paymentsController.BookingReport, adminAccess)
 

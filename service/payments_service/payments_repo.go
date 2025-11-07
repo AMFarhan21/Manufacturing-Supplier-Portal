@@ -5,4 +5,5 @@ type PaymentsRepo interface {
 	GetById(id int, userId string) (Payments, error)
 	UpdateStatusAndMethod(id int, status, method string) error
 	BookingReport() ([]BookingsReport, error)
+	GetAll(userId string) ([]Payments, error)
 }

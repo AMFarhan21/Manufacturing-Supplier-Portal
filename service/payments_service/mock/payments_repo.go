@@ -64,6 +64,21 @@ func (mr *MockPaymentsRepoMockRecorder) Create(data interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPaymentsRepo)(nil).Create), data)
 }
 
+// GetAll mocks base method.
+func (m *MockPaymentsRepo) GetAll(userId string) ([]payments_service.Payments, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", userId)
+	ret0, _ := ret[0].([]payments_service.Payments)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockPaymentsRepoMockRecorder) GetAll(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPaymentsRepo)(nil).GetAll), userId)
+}
+
 // GetById mocks base method.
 func (m *MockPaymentsRepo) GetById(id int, userId string) (payments_service.Payments, error) {
 	m.ctrl.T.Helper()

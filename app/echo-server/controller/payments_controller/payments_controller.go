@@ -53,3 +53,16 @@ func (ctrl PaymentsController) BookingReport(c echo.Context) error {
 	log.Print("Successfully get booking report")
 	return c.JSON(http.StatusOK, fres.Response.StatusOK(bookingReport))
 }
+
+func (ctrl PaymentsController) GetAllPaymentsByUserId(c echo.Context) error {
+	userId := c.Get("id").(string)
+	payments, err := ctrl.service.GetAllPayments(userId)
+
+	if err != nil {
+		log.Print("Error on GetAllPaymentsByUserId server:", err.Error())
+		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	}
+
+	log.Print("Successfully get all payments")
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(payments))
+}
