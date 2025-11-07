@@ -113,10 +113,10 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.status = 'ACTIVE' THEN
         INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
-        (NEW.id, NEW.user_id, NEW.status, NOW());
+        (NEW.id, NEW.user_id, 'ACTIVE', NOW());
     ELSIF NEW.status = 'COMPLETED' THEN
         INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
-        (NEW.id, NEW.user_id, NEW.status, NOW());
+        (NEW.id, NEW.user_id, 'COMPLETED', NOW());
         RETURN NEW;
     END IF;
 END;

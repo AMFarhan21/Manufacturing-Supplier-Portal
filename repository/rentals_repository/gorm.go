@@ -75,7 +75,7 @@ func (r RentalsGormRepository) SimulateAutomaticUpdateRentalStatus() error {
 		return err
 	}
 
-	err = r.DB.WithContext(ctx).Where("status=? AND start_date < ?", "ACTIVE", time.Now()).Update("status", "COMPLETED").Error
+	err = r.DB.WithContext(ctx).Where("status=? AND end_date < ?", "ACTIVE", time.Now()).Update("status", "COMPLETED").Error
 	if err != nil {
 		return err
 	}
