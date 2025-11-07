@@ -92,9 +92,9 @@ INSERT INTO equipments (name, category_id, description, price_per_day, price_per
 CREATE OR REPLACE FUNCTION fn_update_rental_status()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.status = 'BOOKED' AND NEW.start_date < NOW() THEN
+    IF OLD.status = 'BOOKED' AND NEW.start_date < NOW() THEN
     NEW.status := 'ACTIVE';
-    ELSIF NEW.status = 'ACTIVE' AND NEW.end_date < NOW() THEN
+    ELSIF OLD.status = 'ACTIVE' AND NEW.end_date < NOW() THEN
     NEW.status := 'COMPLETED';
     END IF;
     RETURN NEW;
@@ -110,9 +110,11 @@ EXECUTE FUNCTION fn_update_rental_status();
 CREATE OR REPLACE FUNCTION fn_insert_rental_histories_status()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
-    (NEW.id, NEW.user_id, NEW.status, NOW());
-    RETURN NEW;
+    IF NEW.status = 'ACTIVE' THEN
+        INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
+        (NEW.id, NEW.user_id, NEW.status, NOW());
+        RETURN NEW;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
