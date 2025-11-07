@@ -84,3 +84,44 @@ INSERT INTO equipments (id, name, category_id, description, price_per_day, price
 (11, 'Wacker Neuson BS50-2', 9, 'Tamping rammer untuk pemadatan spot', 200000, 1000000, 3000000, 30000000, true),
 (12, 'Caterpillar 627K', 10, 'Scraper tandem loader', 8500000, 55000000, 160000000, 1600000000, true)
 ;
+
+
+
+-- UPDATE RENTAL STATUS
+CREATE OR REPLACE FUNCTION fn_update_rental_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status = 'BOOKED' AND NEW.start_date < NOW() THEN
+    NEW.status := 'ACTIVE';
+    ELSIF NEW.status = 'ACTIVE' AND NEW.end_date < NOW() THEN
+    NEW.status := 'COMPLETED';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_rental_status
+BEFORE UPDATE ON rentals
+FOR EACH ROW
+EXECUTE FUNCTION fn_update_rental_status();
+
+-- INSERT RENTAL HISTORIES
+CREATE OR REPLACE FUNCTION fn_insert_rental_histories_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
+    (NEW.id, NEW.user_id, NEW.status, NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_insert_rental_histories_status
+AFTER UPDATE ON rentals
+FOR EACH ROW
+EXECUTE FUNCTION fn_insert_rental_histories_status();
+
+
+-- DROP TRIGGER IF EXISTS trg_update_rental_status ON rentals;
+-- DROP TRIGGER IF EXISTS trg_insert_rental_histories_status ON rentals;
+-- DROP FUNCTION IF EXISTS fn_update_rental_status();
+-- DROP FUNCTION IF EXISTS fn_insert_rental_histories_status();

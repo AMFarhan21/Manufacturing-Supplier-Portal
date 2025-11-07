@@ -54,6 +54,10 @@ func (s RentalsService) CreateRental(data Rentals) (RentalsWithInvoiceUrl, error
 		return RentalsWithInvoiceUrl{}, err
 	}
 
+	if !*equipment.Available {
+		return RentalsWithInvoiceUrl{}, errors.New("this equipment is not available")
+	}
+
 	var price float64
 	switch data.RentalPeriod {
 	case "day":
@@ -160,7 +164,7 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 	var endDate string
 
 	switch status {
-	case "ACTIVE":
+	case "BOOKED":
 		switch rental.RentalPeriod {
 		case "day":
 			period = 24
@@ -172,7 +176,7 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 			period = 24 * 365
 		}
 
-		now := time.Now()
+		now := time.Now().Add(time.Minute * 1)
 		startDate = now.Format("2006-01-02")
 		endDate = now.Add(time.Hour * period).Format("2006-01-02")
 		err := s.equipmentRepo.UpdateStatus(rental.EquipmentId, false)
@@ -186,6 +190,21 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 			Status:    status,
 			CreatedAt: rental.CreatedAt,
 		})
+		if err != nil {
+			return err
+		}
+
+		// search for users
+		user, err := s.userRepo.FindById(userId)
+		if err != nil {
+			return err
+		}
+
+		// substract user deposit
+		amount := user.DepositAmount - payment.Amount
+
+		// update user deposit amount
+		_, err = s.userRepo.UpdateDepositAmount(userId, amount)
 		if err != nil {
 			return err
 		}

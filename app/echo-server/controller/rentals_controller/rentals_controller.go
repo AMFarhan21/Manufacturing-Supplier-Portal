@@ -59,6 +59,15 @@ func (ctrl RentalsController) CreateRental(c echo.Context) error {
 				Error:   http.StatusBadRequest,
 			})
 		}
+
+		if strings.Contains(err.Error(), "this equipment is not available") {
+			log.Print("Error on CreateRental request body:", err.Error())
+			return c.JSON(http.StatusBadRequest, fres.DefaultErrorResponse{
+				Success: false,
+				Message: err.Error(),
+				Error:   http.StatusBadRequest,
+			})
+		}
 		log.Print("Error on create rental server:", err.Error())
 		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 	}

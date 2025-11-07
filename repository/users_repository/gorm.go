@@ -59,16 +59,16 @@ func (r *UsersGormRepository) GetAll() ([]users_service.UsersResponse, error) {
 	return users, nil
 }
 
-func (r *UsersGormRepository) TopUp(userId string, amount float64) (float64, error) {
+func (r *UsersGormRepository) UpdateDepositAmount(userId string, amount float64) (float64, error) {
 	ctx := context.Background()
 	row := r.DB.WithContext(ctx).Where("id=?", userId).Update("deposit_amount", amount)
 
-	if row.RowsAffected == 0 {
-		return 0, fmt.Errorf("cannot find user with the id %v", userId)
-	}
-
 	if err := row.Error; err != nil {
 		return 0, err
+	}
+
+	if row.RowsAffected == 0 {
+		return 0, fmt.Errorf("cannot find user with the id %v", userId)
 	}
 
 	return amount, nil

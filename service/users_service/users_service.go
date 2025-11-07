@@ -102,5 +102,5 @@ func (s UsersService) TopUp(userId string, amount float64) (float64, error) {
 
 	amount = user.DepositAmount + amount
 
-	return s.repo.TopUp(userId, amount)
+	return s.repo.UpdateDepositAmount(userId, amount)
 }

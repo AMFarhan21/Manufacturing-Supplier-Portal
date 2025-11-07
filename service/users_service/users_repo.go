@@ -5,5 +5,5 @@ type UsersRepo interface {
 	FindByEmail(email string) (Users, error)
 	FindById(id string) (UsersResponse, error)
 	GetAll() ([]UsersResponse, error)
-	TopUp(userId string, amount float64) (float64, error)
+	UpdateDepositAmount(userId string, amount float64) (float64, error)
 }
