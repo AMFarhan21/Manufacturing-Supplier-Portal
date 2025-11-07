@@ -67,3 +67,17 @@ func (r RentalsGormRepository) UpdateStatusAndDateRepo(id int, status string, st
 
 	return nil
 }
+
+func (r RentalsGormRepository) SimulateAutomaticUpdateRentalStatus() error {
+	ctx := context.Background()
+	err := r.DB.WithContext(ctx).Where("status=? AND start_date < ?", "BOOKED", time.Now()).Update("status", "ACTIVE").Error
+	if err != nil {
+		return err
+	}
+
+	err = r.DB.WithContext(ctx).Where("status=? AND start_date < ?", "ACTIVE", time.Now()).Update("status", "COMPLETED").Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

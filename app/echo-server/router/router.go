@@ -61,4 +61,5 @@ func Router(
 	rentals := e.Group("api/rentals", middlewares)
 	rentals.POST("", rentalsController.CreateRental, userAccess)
 	rentals.GET("/history", rentalsController.GetAllRentalHistoriesByUserId, userAccess)
+	rentals.GET("/autoUpdate", rentalsController.SimulateAutomaticUpdateRentalStatus, userAccess)
 }

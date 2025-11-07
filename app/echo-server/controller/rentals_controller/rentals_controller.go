@@ -88,3 +88,14 @@ func (ctrl RentalsController) GetAllRentalHistoriesByUserId(c echo.Context) erro
 	log.Print("Successfully get all rental histories")
 	return c.JSON(http.StatusOK, fres.Response.StatusOK(rentalHistories))
 }
+
+func (ctrl RentalsController) SimulateAutomaticUpdateRentalStatus(c echo.Context) error {
+	err := ctrl.service.SimulateAutomaticUpdateRentalStatus()
+	if err != nil {
+		log.Print("Error on SimulateAutomaticUpdateRentalStatus server:", err.Error())
+		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	}
+
+	log.Print("Successfully simulate auto update status")
+	return c.JSON(http.StatusOK, fres.Response.StatusOK("updated status"))
+}

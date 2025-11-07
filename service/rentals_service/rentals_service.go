@@ -26,6 +26,7 @@ type Service interface {
 	rentalWithInvoiceUrl(rentalEquipmentUser RentalEquipmentUser, rental Rentals, paymentId int) (RentalsWithInvoiceUrl, error)
 	UpdateStatusAndDate(paymentId int, userId, status string) error
 	GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error)
+	SimulateAutomaticUpdateRentalStatus() error
 }
 
 func NewRentalsService(
@@ -238,4 +239,8 @@ func (s RentalsService) UpdateStatusAndDate(paymentId int, userId, status string
 
 func (s RentalsService) GetAllRentalHistoriesByUserId(userId string) ([]rental_histories_service.RentalHistories, error) {
 	return s.rentalHistoriesRepo.GetAll(userId)
+}
+
+func (s RentalsService) SimulateAutomaticUpdateRentalStatus() error {
+	return s.rentalRepo.SimulateAutomaticUpdateRentalStatus()
 }

@@ -88,29 +88,33 @@ INSERT INTO equipments (name, category_id, description, price_per_day, price_per
 
 
 
--- UPDATE RENTAL STATUS
-CREATE OR REPLACE FUNCTION fn_update_rental_status()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF OLD.status = 'BOOKED' AND NEW.start_date < NOW() THEN
-    NEW.status := 'ACTIVE';
-    ELSIF OLD.status = 'ACTIVE' AND NEW.end_date < NOW() THEN
-    NEW.status := 'COMPLETED';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- -- UPDATE RENTAL STATUS
+-- CREATE OR REPLACE FUNCTION fn_update_rental_status()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     IF OLD.status = 'BOOKED' AND NEW.start_date < NOW() THEN
+--     NEW.status := 'ACTIVE';
+--     ELSIF OLD.status = 'ACTIVE' AND NEW.end_date < NOW() THEN
+--     NEW.status := 'COMPLETED';
+--     END IF;
+    
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_update_rental_status
-BEFORE UPDATE ON rentals
-FOR EACH ROW
-EXECUTE FUNCTION fn_update_rental_status();
+-- CREATE TRIGGER trg_update_rental_status
+-- BEFORE UPDATE ON rentals
+-- FOR EACH ROW
+-- EXECUTE FUNCTION fn_update_rental_status();
 
 -- INSERT RENTAL HISTORIES
 CREATE OR REPLACE FUNCTION fn_insert_rental_histories_status()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.status = 'ACTIVE' THEN
+        INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
+        (NEW.id, NEW.user_id, NEW.status, NOW());
+    ELSIF NEW.status = 'COMPLETED' THEN
         INSERT INTO rental_histories (rental_id, user_id, status, created_at) VALUES
         (NEW.id, NEW.user_id, NEW.status, NOW());
         RETURN NEW;
@@ -140,10 +144,10 @@ EXECUTE FUNCTION fn_update_equipment_availability();
 
 
 
-DROP TRIGGER IF EXISTS trg_update_rental_status ON rentals;
+-- DROP TRIGGER IF EXISTS trg_update_rental_status ON rentals;
 DROP TRIGGER IF EXISTS trg_insert_rental_histories_status ON rentals;
 DROP TRIGGER IF EXISTS trg_update_equipment_availablity ON rentals;
-DROP FUNCTION IF EXISTS fn_update_rental_status();
+-- DROP FUNCTION IF EXISTS fn_update_rental_status();
 DROP FUNCTION IF EXISTS fn_insert_rental_histories_status();
 DROP FUNCTION IF EXISTS fn_update_equipment_availability();
 
