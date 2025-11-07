@@ -97,5 +97,5 @@ func (ctrl RentalsController) SimulateAutomaticUpdateRentalStatus(c echo.Context
 	}
 
 	log.Print("Successfully simulate auto update status")
-	return c.JSON(http.StatusOK, fres.Response.StatusOK("updated status"))
+	return c.JSON(http.StatusOK, fres.Response.StatusOK("refreshed"))
 }
