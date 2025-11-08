@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/AMFarhan21/fres"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -218,10 +217,8 @@ func (ctrl UsersController) TopUpDeposit(c echo.Context) error {
 		log.Print("Error on TopUpDeposit validation:", err.Error())
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
-	spew.Dump(id)
-	spew.Dump(request.DepositAmount)
 
-	currentDepositAmount, err := ctrl.service.TopUp(id, request.DepositAmount)
+	InvoiceURL, err := ctrl.service.TopUp(id, request.DepositAmount)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find user with the id") {
 			log.Print("Error on TopUpDeposit service:", err.Error())
@@ -233,5 +230,5 @@ func (ctrl UsersController) TopUpDeposit(c echo.Context) error {
 	}
 
 	log.Print("Successfully top up your deposit")
-	return c.JSON(http.StatusOK, fres.Response.StatusOK(fmt.Sprintf("Successfully top up. Your current deposit is Rp.%.2f", currentDepositAmount)))
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(fmt.Sprintf("Successfully top up. Your current deposit is Rp.%.2f", InvoiceURL)))
 }

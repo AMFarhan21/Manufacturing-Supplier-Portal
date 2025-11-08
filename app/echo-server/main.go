@@ -62,7 +62,7 @@ func main() {
 	xenditRepository := xendit.NewXenditRepository(xenditApi, xenditUrl, xenditWebhookUrl, successRedirectUrl, failureRedirectUrl)
 
 	usersRepository := users_repository.NewUsersGormRepository(db)
-	usersService := users_service.NewUsersService(usersRepository, secret)
+	usersService := users_service.NewUsersService(usersRepository, xenditRepository, secret)
 	usersController := controller.NewUsersController(usersService)
 
 	equipmentsRepository := equipments_repository.NewEquipmentsGormRepository(db)
@@ -79,7 +79,7 @@ func main() {
 	rentalsService := rentals_service.NewRentalsService(rentalsRepository, equipmentsRepository, xenditRepository, paymentsRepository, rentalHistoriesRepository, usersRepository)
 	rentalsController := controller.NewRentalsController(rentalsService)
 
-	webHookController := controller.NewWebhookController(paymentService, rentalsService)
+	webHookController := controller.NewWebhookController(paymentService, rentalsService, usersService)
 	router.Router(e, secret, usersController, equipmentsController, rentalsController, webHookController, paymentsController)
 
 	fmt.Println("Successfully connected to the server!")

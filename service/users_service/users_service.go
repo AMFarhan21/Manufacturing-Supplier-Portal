@@ -2,6 +2,7 @@ package users_service
 
 import (
 	"Manufacturing-Supplier-Portal/model"
+	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
 	"time"
 
@@ -12,8 +13,9 @@ import (
 
 type (
 	UsersService struct {
-		repo      UsersRepo
-		jwtSecret string
+		usersRepo  UsersRepo
+		xenditRepo xendit_service.XenditRepo
+		jwtSecret  string
 	}
 	Service interface {
 		RegisterUser(data model.Users) (model.Users, error)
@@ -21,18 +23,20 @@ type (
 		FindUserById(id string) (model.UsersResponse, error)
 		GetAll() ([]model.UsersResponse, error)
 		TopUp(userId string, amount float64) (float64, error)
+		GetTopUpInvoiceURL(userId string, amount float64) (string, error)
 	}
 )
 
-func NewUsersService(repo UsersRepo, secret string) Service {
+func NewUsersService(usersRepo UsersRepo, xenditRepo xendit_service.XenditRepo, secret string) Service {
 	return &UsersService{
-		repo:      repo,
-		jwtSecret: secret,
+		usersRepo:  usersRepo,
+		xenditRepo: xenditRepo,
+		jwtSecret:  secret,
 	}
 }
 
 func (s UsersService) RegisterUser(data model.Users) (model.Users, error) {
-	user, _ := s.repo.FindByEmail(data.Email)
+	user, _ := s.usersRepo.FindByEmail(data.Email)
 	if user.Email != "" {
 		return model.Users{}, errors.New("email already exists")
 	}
@@ -45,11 +49,11 @@ func (s UsersService) RegisterUser(data model.Users) (model.Users, error) {
 	data.Id = uuid.NewString()
 	data.Password = string(hashedPassword)
 
-	return s.repo.Register(data)
+	return s.usersRepo.Register(data)
 }
 
 func (s UsersService) Login(email, password string) (string, error) {
-	user, err := s.repo.FindByEmail(email)
+	user, err := s.usersRepo.FindByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid email or password")
 	}
@@ -83,7 +87,7 @@ func (s UsersService) Login(email, password string) (string, error) {
 }
 
 func (s UsersService) FindUserById(id string) (model.UsersResponse, error) {
-	user, err := s.repo.FindById(id)
+	user, err := s.usersRepo.FindById(id)
 	if err != nil {
 		return model.UsersResponse{}, err
 	}
@@ -92,16 +96,30 @@ func (s UsersService) FindUserById(id string) (model.UsersResponse, error) {
 }
 
 func (s UsersService) GetAll() ([]model.UsersResponse, error) {
-	return s.repo.GetAll()
+	return s.usersRepo.GetAll()
+}
+
+func (s UsersService) GetTopUpInvoiceURL(userId string, amount float64) (string, error) {
+	user, err := s.usersRepo.FindById(userId)
+	if err != nil {
+		return "", err
+	}
+
+	invoiceURL, err := s.xenditRepo.XenditInvoiceUrl(userId, "TOPUP", user.Username, user.Email, "", "", 0, amount)
+	if err != nil {
+		return "", err
+	}
+
+	return invoiceURL, nil
 }
 
 func (s UsersService) TopUp(userId string, amount float64) (float64, error) {
-	user, err := s.repo.FindById(userId)
+	user, err := s.usersRepo.FindById(userId)
 	if err != nil {
 		return 0, err
 	}
 
 	amount = user.DepositAmount + amount
 
-	return s.repo.UpdateDepositAmount(userId, amount)
+	return s.usersRepo.UpdateDepositAmount(userId, amount)
 }

@@ -25,7 +25,7 @@ type (
 		Price        float64    `json:"price"`
 		Status       string     `json:"status"`
 		CreatedAt    time.Time  `json:"created_at"`
-		InvoiceUrl   string     `json:"invoice_url",omitempty`
+		InvoiceUrl   string     `json:"invoice_url,omitempty"`
 	}
 
 	RentalEquipmentUser struct {
