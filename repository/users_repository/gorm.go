@@ -1,7 +1,7 @@
 package users_repository
 
 import (
-	"Manufacturing-Supplier-Portal/service/users_service"
+	"Manufacturing-Supplier-Portal/model"
 	"context"
 	"fmt"
 
@@ -18,39 +18,39 @@ func NewUsersGormRepository(db *gorm.DB) *UsersGormRepository {
 	}
 }
 
-func (r *UsersGormRepository) Register(data users_service.Users) (users_service.Users, error) {
+func (r *UsersGormRepository) Register(data model.Users) (model.Users, error) {
 	ctx := context.Background()
 	err := r.DB.WithContext(ctx).Create(&data).Error
 	if err != nil {
-		return users_service.Users{}, err
+		return model.Users{}, err
 	}
 	return data, nil
 }
 
-func (r *UsersGormRepository) FindByEmail(email string) (users_service.Users, error) {
+func (r *UsersGormRepository) FindByEmail(email string) (model.Users, error) {
 	ctx := context.Background()
-	var user users_service.Users
+	var user model.Users
 	err := r.DB.WithContext(ctx).Where("email=?", email).First(&user).Error
 	if err != nil {
-		return users_service.Users{}, err
+		return model.Users{}, err
 	}
 	return user, nil
 }
 
-func (r *UsersGormRepository) FindById(id string) (users_service.UsersResponse, error) {
+func (r *UsersGormRepository) FindById(id string) (model.UsersResponse, error) {
 	ctx := context.Background()
-	var user users_service.UsersResponse
+	var user model.UsersResponse
 	err := r.DB.WithContext(ctx).Where("id=?", id).First(&user).Error
 	if err != nil {
-		return users_service.UsersResponse{}, err
+		return model.UsersResponse{}, err
 	}
 
 	return user, nil
 }
 
-func (r *UsersGormRepository) GetAll() ([]users_service.UsersResponse, error) {
+func (r *UsersGormRepository) GetAll() ([]model.UsersResponse, error) {
 	ctx := context.Background()
-	var users []users_service.UsersResponse
+	var users []model.UsersResponse
 	err := r.DB.WithContext(ctx).Find(&users).Error
 	if err != nil {
 		return nil, err

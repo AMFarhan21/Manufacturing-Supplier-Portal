@@ -1,4 +1,4 @@
-package webhook_controller
+package controller
 
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"

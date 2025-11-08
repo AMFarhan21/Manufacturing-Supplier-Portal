@@ -5,7 +5,7 @@
 package mock_users_service
 
 import (
-	users_service "Manufacturing-Supplier-Portal/service/users_service"
+	model "Manufacturing-Supplier-Portal/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,10 +35,10 @@ func (m *MockUsersRepo) EXPECT() *MockUsersRepoMockRecorder {
 }
 
 // FindByEmail mocks base method.
-func (m *MockUsersRepo) FindByEmail(email string) (users_service.Users, error) {
+func (m *MockUsersRepo) FindByEmail(email string) (model.Users, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByEmail", email)
-	ret0, _ := ret[0].(users_service.Users)
+	ret0, _ := ret[0].(model.Users)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockUsersRepoMockRecorder) FindByEmail(email interface{}) *gomock.Call
 }
 
 // FindById mocks base method.
-func (m *MockUsersRepo) FindById(id string) (users_service.UsersResponse, error) {
+func (m *MockUsersRepo) FindById(id string) (model.UsersResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindById", id)
-	ret0, _ := ret[0].(users_service.UsersResponse)
+	ret0, _ := ret[0].(model.UsersResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +65,10 @@ func (mr *MockUsersRepoMockRecorder) FindById(id interface{}) *gomock.Call {
 }
 
 // GetAll mocks base method.
-func (m *MockUsersRepo) GetAll() ([]users_service.UsersResponse, error) {
+func (m *MockUsersRepo) GetAll() ([]model.UsersResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]users_service.UsersResponse)
+	ret0, _ := ret[0].([]model.UsersResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockUsersRepoMockRecorder) GetAll() *gomock.Call {
 }
 
 // Register mocks base method.
-func (m *MockUsersRepo) Register(data users_service.Users) (users_service.Users, error) {
+func (m *MockUsersRepo) Register(data model.Users) (model.Users, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Register", data)
-	ret0, _ := ret[0].(users_service.Users)
+	ret0, _ := ret[0].(model.Users)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

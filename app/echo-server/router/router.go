@@ -1,11 +1,7 @@
 package router
 
 import (
-	"Manufacturing-Supplier-Portal/app/echo-server/controller/equipments_controller"
-	"Manufacturing-Supplier-Portal/app/echo-server/controller/payments_controller"
-	"Manufacturing-Supplier-Portal/app/echo-server/controller/rentals_controller"
-	"Manufacturing-Supplier-Portal/app/echo-server/controller/users_controller"
-	"Manufacturing-Supplier-Portal/app/echo-server/controller/webhook_controller"
+	"Manufacturing-Supplier-Portal/app/echo-server/controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/middleware"
 	"log"
 	"net/http"
@@ -17,11 +13,11 @@ import (
 func Router(
 	e *echo.Echo,
 	jwtSecret string,
-	usersController *users_controller.UsersController,
-	equipmentsController *equipments_controller.EquipmentsController,
-	rentalsController *rentals_controller.RentalsController,
-	webHookController *webhook_controller.WebhookController,
-	paymentsController *payments_controller.PaymentsController,
+	usersController *controller.UsersController,
+	equipmentsController *controller.EquipmentsController,
+	rentalsController *controller.RentalsController,
+	webHookController *controller.WebhookController,
+	paymentsController *controller.PaymentsController,
 ) {
 	middlewares := middleware.JWTMiddleware(jwtSecret)
 	adminAccess := middleware.ACLMiddleware(map[string]bool{

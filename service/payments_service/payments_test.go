@@ -1,6 +1,7 @@
 package payments_service_test
 
 import (
+	"Manufacturing-Supplier-Portal/model"
 	"Manufacturing-Supplier-Portal/service/payments_service"
 	mock_payments_service "Manufacturing-Supplier-Portal/service/payments_service/mock"
 	"errors"
@@ -14,23 +15,23 @@ import (
 func TestCreate(t *testing.T) {
 	tests := []struct {
 		name          string
-		inputPayments payments_service.Payments
+		inputPayments model.Payments
 		mockPayments  func(m *mock_payments_service.MockPaymentsRepo)
 		wantErr       bool
 	}{
 		{
 			name:          "Error on create",
-			inputPayments: payments_service.Payments{},
+			inputPayments: model.Payments{},
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().Create(gomock.Any()).Return(payments_service.Payments{}, errors.New("There is no data"))
+				m.EXPECT().Create(gomock.Any()).Return(model.Payments{}, errors.New("There is no data"))
 			},
 			wantErr: true,
 		},
 		{
 			name:          "Success on create",
-			inputPayments: payments_service.Payments{},
+			inputPayments: model.Payments{},
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().Create(gomock.Any()).Return(payments_service.Payments{
+				m.EXPECT().Create(gomock.Any()).Return(model.Payments{
 					Id:            1,
 					UserId:        "kdjshfsakjdsgh",
 					RentalId:      1,
@@ -58,7 +59,7 @@ func TestCreate(t *testing.T) {
 
 			create, err := paymentsService.Create(tt.inputPayments)
 			if tt.wantErr {
-				assert.Equal(t, payments_service.Payments{}, create)
+				assert.Equal(t, model.Payments{}, create)
 				assert.NotNil(t, err)
 			} else {
 				assert.Nil(t, err)
@@ -81,7 +82,7 @@ func TestGetById(t *testing.T) {
 			userId: "asdhfdfsadojf",
 			name:   "Error on get by id",
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().GetById(1, "asdhfdfsadojf").Return(payments_service.Payments{}, errors.New("There is no data"))
+				m.EXPECT().GetById(1, "asdhfdfsadojf").Return(model.Payments{}, errors.New("There is no data"))
 			},
 			wantErr: true,
 		},
@@ -90,7 +91,7 @@ func TestGetById(t *testing.T) {
 			userId: "asdhfdfsadojf",
 			name:   "Success on get by id",
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().GetById(1, "asdhfdfsadojf").Return(payments_service.Payments{
+				m.EXPECT().GetById(1, "asdhfdfsadojf").Return(model.Payments{
 					Id:            1,
 					UserId:        "kdjshfsakjdsgh",
 					RentalId:      1,
@@ -118,7 +119,7 @@ func TestGetById(t *testing.T) {
 
 			getById, err := paymentsService.GetById(tt.id, tt.userId)
 			if tt.wantErr {
-				assert.Equal(t, payments_service.Payments{}, getById)
+				assert.Equal(t, model.Payments{}, getById)
 				assert.NotNil(t, err)
 			} else {
 				assert.Nil(t, err)
@@ -195,14 +196,14 @@ func TestBookingReport(t *testing.T) {
 		{
 			name: "Error on BookingReport",
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().BookingReport().Return([]payments_service.BookingsReport{}, errors.New("There is no data"))
+				m.EXPECT().BookingReport().Return([]model.BookingsReport{}, errors.New("There is no data"))
 			},
 			wantErr: true,
 		},
 		{
 			name: "Success on BookingReport",
 			mockPayments: func(m *mock_payments_service.MockPaymentsRepo) {
-				m.EXPECT().BookingReport().Return([]payments_service.BookingsReport{
+				m.EXPECT().BookingReport().Return([]model.BookingsReport{
 					{
 						Id:           1,
 						Name:         "ayam",
@@ -229,7 +230,7 @@ func TestBookingReport(t *testing.T) {
 
 			bookingReport, err := paymentsService.BookingReport()
 			if tt.wantErr {
-				assert.Equal(t, []payments_service.BookingsReport{}, bookingReport)
+				assert.Equal(t, []model.BookingsReport{}, bookingReport)
 				assert.NotNil(t, err)
 			} else {
 				assert.Nil(t, err)

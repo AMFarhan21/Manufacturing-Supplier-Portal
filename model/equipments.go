@@ -1,4 +1,4 @@
-package equipments_service
+package model
 
 type (
 	Equipments struct {

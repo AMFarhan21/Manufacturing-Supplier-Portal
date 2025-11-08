@@ -1,10 +1,13 @@
 package rentals_service
 
-import "time"
+import (
+	"Manufacturing-Supplier-Portal/model"
+	"time"
+)
 
 type RentalsRepo interface {
-	Create(data Rentals) (Rentals, error)
-	GetRentalById(id int) (RentalEquipmentUser, error)
+	Create(data model.Rentals) (model.Rentals, error)
+	GetRentalById(id int) (model.RentalEquipmentUser, error)
 	UpdateStatusAndDateRepo(id int, status string, startDate, endDate time.Time) error
 	SimulateAutomaticUpdateRentalStatus() error
 }

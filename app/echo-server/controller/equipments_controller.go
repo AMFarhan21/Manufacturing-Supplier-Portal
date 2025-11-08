@@ -1,6 +1,7 @@
-package equipments_controller
+package controller
 
 import (
+	"Manufacturing-Supplier-Portal/model"
 	"Manufacturing-Supplier-Portal/service/equipments_service"
 	"log"
 	"net/http"
@@ -50,7 +51,7 @@ func (ctrl EquipmentsController) CreateEquipment(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	equipments, err := ctrl.service.CreateEquipment(equipments_service.Equipments{
+	equipments, err := ctrl.service.CreateEquipment(model.Equipments{
 		Name:          request.Name,
 		CategoryId:    request.CategoryId,
 		Description:   request.Description,
@@ -117,7 +118,7 @@ func (ctrl EquipmentsController) UpdateEquipment(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	equipments, err := ctrl.service.UpdateEquipment(id, equipments_service.Equipments{
+	equipments, err := ctrl.service.UpdateEquipment(id, model.Equipments{
 		Name:          request.Name,
 		CategoryId:    request.CategoryId,
 		Description:   request.Description,

@@ -1,7 +1,7 @@
 package payments_repository
 
 import (
-	"Manufacturing-Supplier-Portal/service/payments_service"
+	"Manufacturing-Supplier-Portal/model"
 	"context"
 
 	"gorm.io/gorm"
@@ -24,19 +24,19 @@ func NewPaymentsGormRepository(db *gorm.DB) *PaymentsGormRepository {
 	}
 }
 
-func (r *PaymentsGormRepository) Create(data payments_service.Payments) (payments_service.Payments, error) {
+func (r *PaymentsGormRepository) Create(data model.Payments) (model.Payments, error) {
 	ctx := context.Background()
 	err := r.DB.WithContext(ctx).Create(&data).Error
 	if err != nil {
-		return payments_service.Payments{}, err
+		return model.Payments{}, err
 	}
 
 	return data, nil
 }
 
-func (r *PaymentsGormRepository) GetAll(userId string) ([]payments_service.Payments, error) {
+func (r *PaymentsGormRepository) GetAll(userId string) ([]model.Payments, error) {
 	ctx := context.Background()
-	var payments []payments_service.Payments
+	var payments []model.Payments
 	err := r.DB.WithContext(ctx).Where("user_id=?", userId).Find(&payments).Error
 	if err != nil {
 		return nil, err
@@ -45,12 +45,12 @@ func (r *PaymentsGormRepository) GetAll(userId string) ([]payments_service.Payme
 	return payments, nil
 }
 
-func (r *PaymentsGormRepository) GetById(id int, userId string) (payments_service.Payments, error) {
+func (r *PaymentsGormRepository) GetById(id int, userId string) (model.Payments, error) {
 	ctx := context.Background()
-	var payment payments_service.Payments
+	var payment model.Payments
 	err := r.DB.WithContext(ctx).Where("id=?", id).Where("user_id=?", userId).First(&payment).Error
 	if err != nil {
-		return payments_service.Payments{}, err
+		return model.Payments{}, err
 	}
 
 	return payment, nil
@@ -69,9 +69,9 @@ func (r *PaymentsGormRepository) UpdateStatusAndMethod(id int, status, method st
 	return nil
 }
 
-func (r *PaymentsGormRepository) BookingReport() ([]payments_service.BookingsReport, error) {
+func (r *PaymentsGormRepository) BookingReport() ([]model.BookingsReport, error) {
 	ctx := context.Background()
-	var bookingReport []payments_service.BookingsReport
+	var bookingReport []model.BookingsReport
 	err := r.DB.WithContext(ctx).
 		Select("equipments.id, equipments.name, SUM(payments.amount) as total_income, COUNT(payments.id) as total_booking").
 		Joins("LEFT JOIN rentals ON rentals.id = payments.rental_id").

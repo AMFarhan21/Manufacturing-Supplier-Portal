@@ -1,6 +1,7 @@
-package rentals_controller
+package controller
 
 import (
+	"Manufacturing-Supplier-Portal/model"
 	"Manufacturing-Supplier-Portal/service/rentals_service"
 	"log"
 	"net/http"
@@ -18,8 +19,9 @@ type (
 	}
 
 	RentalsInput struct {
-		EquipmentId  int    `json:"equipment_id" validate:"required"`
-		RentalPeriod string `json:"rental_period" validate:"required,oneof=day week month year"`
+		EquipmentId   int    `json:"equipment_id" validate:"required"`
+		RentalPeriod  string `json:"rental_period" validate:"required,oneof=day week month year"`
+		PaymentMethod string `json:"payment_method" validate:"required,oneof=wallet transfer"`
 	}
 )
 
@@ -45,11 +47,11 @@ func (ctrl RentalsController) CreateRental(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	rental, err := ctrl.service.CreateRental(rentals_service.Rentals{
+	rental, err := ctrl.service.CreateRental(model.Rentals{
 		UserId:       userId,
 		EquipmentId:  request.EquipmentId,
 		RentalPeriod: request.RentalPeriod,
-	})
+	}, request.PaymentMethod)
 	if err != nil {
 		if strings.Contains(err.Error(), "you dont have enough money to rent this equipment") {
 			log.Print("Error on CreateRental request body:", err.Error())

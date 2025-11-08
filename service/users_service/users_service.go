@@ -1,6 +1,7 @@
 package users_service
 
 import (
+	"Manufacturing-Supplier-Portal/model"
 	"errors"
 	"time"
 
@@ -15,10 +16,10 @@ type (
 		jwtSecret string
 	}
 	Service interface {
-		RegisterUser(data Users) (Users, error)
+		RegisterUser(data model.Users) (model.Users, error)
 		Login(email, password string) (string, error)
-		FindUserById(id string) (UsersResponse, error)
-		GetAll() ([]UsersResponse, error)
+		FindUserById(id string) (model.UsersResponse, error)
+		GetAll() ([]model.UsersResponse, error)
 		TopUp(userId string, amount float64) (float64, error)
 	}
 )
@@ -30,15 +31,15 @@ func NewUsersService(repo UsersRepo, secret string) Service {
 	}
 }
 
-func (s UsersService) RegisterUser(data Users) (Users, error) {
+func (s UsersService) RegisterUser(data model.Users) (model.Users, error) {
 	user, _ := s.repo.FindByEmail(data.Email)
 	if user.Email != "" {
-		return Users{}, errors.New("email already exists")
+		return model.Users{}, errors.New("email already exists")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return Users{}, err
+		return model.Users{}, err
 	}
 
 	data.Id = uuid.NewString()
@@ -81,16 +82,16 @@ func (s UsersService) Login(email, password string) (string, error) {
 	return signedToken, nil
 }
 
-func (s UsersService) FindUserById(id string) (UsersResponse, error) {
+func (s UsersService) FindUserById(id string) (model.UsersResponse, error) {
 	user, err := s.repo.FindById(id)
 	if err != nil {
-		return UsersResponse{}, err
+		return model.UsersResponse{}, err
 	}
 
 	return user, nil
 }
 
-func (s UsersService) GetAll() ([]UsersResponse, error) {
+func (s UsersService) GetAll() ([]model.UsersResponse, error) {
 	return s.repo.GetAll()
 }
 

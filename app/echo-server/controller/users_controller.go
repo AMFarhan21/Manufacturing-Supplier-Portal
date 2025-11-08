@@ -1,6 +1,7 @@
-package users_controller
+package controller
 
 import (
+	"Manufacturing-Supplier-Portal/model"
 	"Manufacturing-Supplier-Portal/service/users_service"
 	"fmt"
 	"log"
@@ -44,6 +45,16 @@ func NewUsersController(service users_service.Service) *UsersController {
 	}
 }
 
+// ShowAccount godoc
+// @Summary      Register user
+// @Description  Register a new user account
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param		request body RegisterInput true "Registration details"
+// @Success      201  {object}  users_service.UsersResponse "User registered successfully"
+// @Failure      400  {object}  map[string]interface{} "Invalid input or validation error"
+// @Router       /auth/register [post]
 func (ctrl UsersController) RegisterUser(c echo.Context) error {
 	var request RegisterInput
 
@@ -61,7 +72,7 @@ func (ctrl UsersController) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	user, err := ctrl.service.RegisterUser(users_service.Users{
+	user, err := ctrl.service.RegisterUser(model.Users{
 		Username:      request.Username,
 		Email:         request.Email,
 		Password:      request.Password,
@@ -79,15 +90,26 @@ func (ctrl UsersController) RegisterUser(c echo.Context) error {
 	}
 
 	log.Print("Successfully register a user")
-	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(users_service.UsersResponse{
+	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(model.UsersResponse{
 		Id:            user.Id,
 		Username:      user.Username,
 		Email:         user.Email,
 		DepositAmount: user.DepositAmount,
 		Role:          user.Role,
 	}))
+
 }
 
+// @Summary      Login
+// @Description  Authenticate user and return JWT token
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        request body LoginInput true "Login credentials"
+// @Success      200    {object}  map[string]interface{}
+// @Failure      400    {object}  map[string]interface{}
+// @Failure      401    {object}  map[string]interface{}
+// @Router       /auth/login [post]
 func (ctrl UsersController) LoginUser(c echo.Context) error {
 	var request LoginInput
 
@@ -117,6 +139,18 @@ func (ctrl UsersController) LoginUser(c echo.Context) error {
 
 }
 
+// @Summary      Get user by jwttoken id
+// @Description  User can see the specific information in their user account
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @Security	BearerAuth
+// @Success      200    {object}  users_service.Users "User retrieved successfully"
+// @Failure      400    {object}  map[string]interface{} "Invalid userId"
+// @Failure      401    {object}  map[string]interface{} "Unauthorized"
+// @Failure 	404 	{object}  map[string]interface{} "Forbidden"
+// @Failure      500    {object}  map[string]interface{} "User not found"
+// @Router       /users/me [get]
 func (ctrl UsersController) GetUserLogin(c echo.Context) error {
 	id := c.Get("id").(string)
 
@@ -127,7 +161,7 @@ func (ctrl UsersController) GetUserLogin(c echo.Context) error {
 	}
 
 	log.Print("Successfully get login user")
-	return c.JSON(http.StatusOK, fres.Response.StatusOK(users_service.UsersResponse{
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(model.UsersResponse{
 		Id:            user.Id,
 		Username:      user.Username,
 		Email:         user.Email,
@@ -136,6 +170,17 @@ func (ctrl UsersController) GetUserLogin(c echo.Context) error {
 	}))
 }
 
+// @Summary      Get all users
+// @Description  Get list of users
+// @Tags         Admin - Users
+// @Accept       json
+// @Produce      json
+// @Security	BearerAuth
+// @Success      200    {object}  users_service.Users "Successfully retrieved all users"
+// @Failure      401    {object}  map[string]interface{} "Unauthorized"
+// @Failure      403    {object}  map[string]interface{} "Forbidden"
+// @Failure      500    {object}  map[string]interface{} "Users not found"
+// @Router       /users/list [get]
 func (ctrl UsersController) GetAllUsers(c echo.Context) error {
 	users, err := ctrl.service.GetAll()
 	if err != nil {
@@ -147,6 +192,18 @@ func (ctrl UsersController) GetAllUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, fres.Response.StatusOK(users))
 }
 
+// @Summary      Top Up
+// @Description  Users can top up their deposit amount
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @Security	BearerAuth
+// @Success      200    {object}  map[string]interface{} "Successfully top up your deposit"
+// @Param		request body TopUpInput true "Input deposit amount"
+// @Failure      400    {object}  map[string]interface{} "Invalid request or validation input"
+// @Failure      401    {object}  map[string]interface{} "Unauthorized"
+// @Failure      500    {object}  map[string]interface{} "Top up failed"
+// @Router       /users/topup [post]
 func (ctrl UsersController) TopUpDeposit(c echo.Context) error {
 	id := c.Get("id").(string)
 

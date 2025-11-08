@@ -1,4 +1,4 @@
-package xendit_service
+package model
 
 import "time"
 
