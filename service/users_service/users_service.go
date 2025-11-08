@@ -105,9 +105,13 @@ func (s UsersService) GetTopUpInvoiceURL(userId string, amount float64) (string,
 		return "", err
 	}
 
-	invoiceURL, err := s.xenditRepo.XenditInvoiceUrl(userId, "TOPUP", user.Username, user.Email, "", "", 0, amount)
+	invoiceURL, err := s.xenditRepo.XenditInvoiceUrl(userId, "TOPUP", user.Username, user.Email, "TOPUP", "TOPUP", 9999999, amount)
 	if err != nil {
 		return "", err
+	}
+
+	if invoiceURL == "" {
+		return "", errors.New("invoice URL is empty")
 	}
 
 	return invoiceURL, nil

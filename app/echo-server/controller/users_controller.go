@@ -3,7 +3,6 @@ package controller
 import (
 	"Manufacturing-Supplier-Portal/model"
 	"Manufacturing-Supplier-Portal/service/users_service"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -218,9 +217,12 @@ func (ctrl UsersController) TopUpDeposit(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	InvoiceURL, err := ctrl.service.TopUp(id, request.DepositAmount)
+	InvoiceURL, err := ctrl.service.GetTopUpInvoiceURL(id, request.DepositAmount)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find user with the id") {
+			log.Print("Error on TopUpDeposit service:", err.Error())
+			return c.JSON(http.StatusNotFound, fres.Response.StatusNotFound(err.Error()))
+		} else if strings.Contains(err.Error(), "invoice URL is empty") {
 			log.Print("Error on TopUpDeposit service:", err.Error())
 			return c.JSON(http.StatusNotFound, fres.Response.StatusNotFound(err.Error()))
 		}
@@ -230,5 +232,5 @@ func (ctrl UsersController) TopUpDeposit(c echo.Context) error {
 	}
 
 	log.Print("Successfully top up your deposit")
-	return c.JSON(http.StatusOK, fres.Response.StatusOK(fmt.Sprintf("Successfully top up. Your current deposit is Rp.%.2f", InvoiceURL)))
+	return c.JSON(http.StatusOK, fres.Response.StatusOK(InvoiceURL))
 }
