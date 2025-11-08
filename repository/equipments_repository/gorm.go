@@ -1,7 +1,7 @@
 package equipments_repository
 
 import (
-	"Manufacturing-Supplier-Portal/service/equipments_service"
+	"Manufacturing-Supplier-Portal/model"
 	"context"
 	"errors"
 
@@ -18,19 +18,19 @@ func NewEquipmentsGormRepository(db *gorm.DB) *EquipmentsGormRepository {
 	}
 }
 
-func (r *EquipmentsGormRepository) Create(data equipments_service.Equipments) (equipments_service.Equipments, error) {
+func (r *EquipmentsGormRepository) Create(data model.Equipments) (model.Equipments, error) {
 	ctx := context.Background()
 	err := r.DB.WithContext(ctx).Create(&data).Error
 	if err != nil {
-		return equipments_service.Equipments{}, err
+		return model.Equipments{}, err
 	}
 
 	return data, nil
 }
 
-func (r *EquipmentsGormRepository) GetAll() ([]equipments_service.Equipments, error) {
+func (r *EquipmentsGormRepository) GetAll() ([]model.Equipments, error) {
 	ctx := context.Background()
-	var equipments []equipments_service.Equipments
+	var equipments []model.Equipments
 	err := r.DB.WithContext(ctx).Find(&equipments).Error
 	if err != nil {
 		return nil, err
@@ -39,27 +39,27 @@ func (r *EquipmentsGormRepository) GetAll() ([]equipments_service.Equipments, er
 	return equipments, nil
 }
 
-func (r *EquipmentsGormRepository) GetById(id int) (equipments_service.Equipments, error) {
+func (r *EquipmentsGormRepository) GetById(id int) (model.Equipments, error) {
 	ctx := context.Background()
-	var equipment equipments_service.Equipments
+	var equipment model.Equipments
 	err := r.DB.WithContext(ctx).Where("id=?", id).First(&equipment).Error
 	if err != nil {
-		return equipments_service.Equipments{}, err
+		return model.Equipments{}, err
 	}
 
 	return equipment, nil
 }
 
-func (r EquipmentsGormRepository) Update(id int, data equipments_service.Equipments) (equipments_service.Equipments, error) {
+func (r EquipmentsGormRepository) Update(id int, data model.Equipments) (model.Equipments, error) {
 	ctx := context.Background()
 	row := r.DB.WithContext(ctx).Where("id=?", id).Updates(data)
 	if row.RowsAffected == 0 {
-		return equipments_service.Equipments{}, errors.New("equipment id not found")
+		return model.Equipments{}, errors.New("equipment id not found")
 	}
 
 	err := row.Error
 	if err != nil {
-		return equipments_service.Equipments{}, err
+		return model.Equipments{}, err
 	}
 
 	data.Id = id
@@ -69,7 +69,7 @@ func (r EquipmentsGormRepository) Update(id int, data equipments_service.Equipme
 
 func (r *EquipmentsGormRepository) Delete(id int) error {
 	ctx := context.Background()
-	row := r.DB.WithContext(ctx).Where("id=?", id).Delete(equipments_service.Equipments{})
+	row := r.DB.WithContext(ctx).Where("id=?", id).Delete(model.Equipments{})
 	if row.RowsAffected == 0 {
 		return errors.New("equipment id not found")
 	}

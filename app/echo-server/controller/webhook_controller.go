@@ -1,8 +1,9 @@
-package webhook_controller
+package controller
 
 import (
 	"Manufacturing-Supplier-Portal/service/payments_service"
 	"Manufacturing-Supplier-Portal/service/rentals_service"
+	"Manufacturing-Supplier-Portal/service/users_service"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,6 +19,7 @@ type (
 	WebhookController struct {
 		paymentService payments_service.Service
 		rentalService  rentals_service.Service
+		usersService   users_service.Service
 		validate       *validator.Validate
 	}
 
@@ -45,10 +47,11 @@ type (
 	}
 )
 
-func NewWebhookController(paymentService payments_service.Service, rentalService rentals_service.Service) *WebhookController {
+func NewWebhookController(paymentService payments_service.Service, rentalService rentals_service.Service, usersService users_service.Service) *WebhookController {
 	return &WebhookController{
 		paymentService: paymentService,
 		rentalService:  rentalService,
+		usersService:   usersService,
 		validate:       validator.New(),
 	}
 }
@@ -68,31 +71,46 @@ func (ctrl WebhookController) HandleWebhook(c echo.Context) error {
 	paymentId, _ := strconv.Atoi(paymentIDandUserID[0])
 	userId := paymentIDandUserID[1]
 
-	if request.Status == "PAID" {
-		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
-		if err != nil {
-			log.Println("Failed to update payment status:", err.Error())
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	if request.Description == "PAYMENT" {
+		if request.Status == "PAID" {
+			err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
+			if err != nil {
+				log.Println("Failed to update payment status:", err.Error())
+				return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+			}
+
+			err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "BOOKED")
+			if err != nil {
+				log.Println("Failed to update payment status:", err.Error())
+				return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+			}
 		}
 
-		err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "BOOKED")
-		if err != nil {
-			log.Println("Failed to update payment status:", err.Error())
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+		if request.Status == "EXPIRED" {
+			err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
+			if err != nil {
+				log.Println("Failed to update payment status:", err.Error())
+				return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+			}
+
+			err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "CANCELLED")
+			if err != nil {
+				log.Println("Failed to update payment status:", err.Error())
+				return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+			}
 		}
 	}
 
-	if request.Status == "EXPIRED" {
-		err := ctrl.paymentService.UpdateStatusAndMethod(paymentId, request.Status, request.PaymentMethod)
-		if err != nil {
-			log.Println("Failed to update payment status:", err.Error())
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
-		}
-
-		err = ctrl.rentalService.UpdateStatusAndDate(paymentId, userId, "CANCELLED")
-		if err != nil {
-			log.Println("Failed to update payment status:", err.Error())
-			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	if request.Description == "TOPUP" {
+		if request.Status == "PAID" {
+			_, err := ctrl.usersService.TopUp(userId, float64(request.Amount))
+			if err != nil {
+				log.Print("Failed to top up account with userId:", userId)
+				return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError("Failed to top up account with userId"))
+			}
+		} else if request.Status == "EXPIRED" {
+			log.Print("Your invoice url already expired, please retry to top up again", userId)
+			return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError("Your invoice url already expired, please retry to top up again"))
 		}
 	}
 

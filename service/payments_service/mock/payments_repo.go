@@ -5,7 +5,7 @@
 package mock_payments_service
 
 import (
-	payments_service "Manufacturing-Supplier-Portal/service/payments_service"
+	model "Manufacturing-Supplier-Portal/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,10 +35,10 @@ func (m *MockPaymentsRepo) EXPECT() *MockPaymentsRepoMockRecorder {
 }
 
 // BookingReport mocks base method.
-func (m *MockPaymentsRepo) BookingReport() ([]payments_service.BookingsReport, error) {
+func (m *MockPaymentsRepo) BookingReport() ([]model.BookingsReport, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BookingReport")
-	ret0, _ := ret[0].([]payments_service.BookingsReport)
+	ret0, _ := ret[0].([]model.BookingsReport)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockPaymentsRepoMockRecorder) BookingReport() *gomock.Call {
 }
 
 // Create mocks base method.
-func (m *MockPaymentsRepo) Create(data payments_service.Payments) (payments_service.Payments, error) {
+func (m *MockPaymentsRepo) Create(data model.Payments) (model.Payments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", data)
-	ret0, _ := ret[0].(payments_service.Payments)
+	ret0, _ := ret[0].(model.Payments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +65,10 @@ func (mr *MockPaymentsRepoMockRecorder) Create(data interface{}) *gomock.Call {
 }
 
 // GetAll mocks base method.
-func (m *MockPaymentsRepo) GetAll(userId string) ([]payments_service.Payments, error) {
+func (m *MockPaymentsRepo) GetAll(userId string) ([]model.Payments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", userId)
-	ret0, _ := ret[0].([]payments_service.Payments)
+	ret0, _ := ret[0].([]model.Payments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockPaymentsRepoMockRecorder) GetAll(userId interface{}) *gomock.Call 
 }
 
 // GetById mocks base method.
-func (m *MockPaymentsRepo) GetById(id int, userId string) (payments_service.Payments, error) {
+func (m *MockPaymentsRepo) GetById(id int, userId string) (model.Payments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", id, userId)
-	ret0, _ := ret[0].(payments_service.Payments)
+	ret0, _ := ret[0].(model.Payments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

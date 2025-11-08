@@ -1,4 +1,4 @@
-package rentals_service
+package model
 
 import "time"
 
@@ -15,7 +15,7 @@ type (
 		CreatedAt    time.Time  `json:"created_at"`
 	}
 
-	RentalsWithInvoiceUrl struct {
+	RentalsResponse struct {
 		Id           int        `json:"id"`
 		UserId       string     `json:"user_id"`
 		EquipmentId  int        `json:"equipment_id"`
@@ -25,7 +25,7 @@ type (
 		Price        float64    `json:"price"`
 		Status       string     `json:"status"`
 		CreatedAt    time.Time  `json:"created_at"`
-		InvoiceUrl   string     `json:"invoice_url"`
+		InvoiceUrl   string     `json:"invoice_url,omitempty"`
 	}
 
 	RentalEquipmentUser struct {

@@ -3,7 +3,7 @@ CREATE TABLE users (
     username varchar(255) not null,
     email varchar(255) not null unique,
     password varchar(255) not null,
-    deposit_amount decimal(12, 2) default 0,
+    balance decimal(12, 2) default 0,
     role varchar(20) default 'user'
 );
 

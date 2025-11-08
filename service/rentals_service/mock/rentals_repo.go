@@ -5,7 +5,7 @@
 package mock_rentals_service
 
 import (
-	rentals_service "Manufacturing-Supplier-Portal/service/rentals_service"
+	model "Manufacturing-Supplier-Portal/model"
 	reflect "reflect"
 	time "time"
 
@@ -36,10 +36,10 @@ func (m *MockRentalsRepo) EXPECT() *MockRentalsRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRentalsRepo) Create(data rentals_service.Rentals) (rentals_service.Rentals, error) {
+func (m *MockRentalsRepo) Create(data model.Rentals) (model.Rentals, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", data)
-	ret0, _ := ret[0].(rentals_service.Rentals)
+	ret0, _ := ret[0].(model.Rentals)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockRentalsRepoMockRecorder) Create(data interface{}) *gomock.Call {
 }
 
 // GetRentalById mocks base method.
-func (m *MockRentalsRepo) GetRentalById(id int) (rentals_service.RentalEquipmentUser, error) {
+func (m *MockRentalsRepo) GetRentalById(id int) (model.RentalEquipmentUser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRentalById", id)
-	ret0, _ := ret[0].(rentals_service.RentalEquipmentUser)
+	ret0, _ := ret[0].(model.RentalEquipmentUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

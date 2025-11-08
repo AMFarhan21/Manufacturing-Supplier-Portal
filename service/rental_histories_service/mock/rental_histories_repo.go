@@ -5,7 +5,7 @@
 package mock_rental_histories_service
 
 import (
-	rental_histories_service "Manufacturing-Supplier-Portal/service/rental_histories_service"
+	model "Manufacturing-Supplier-Portal/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,10 +35,10 @@ func (m *MockRentalHistoriesRepo) EXPECT() *MockRentalHistoriesRepoMockRecorder 
 }
 
 // CreateRentalHistory mocks base method.
-func (m *MockRentalHistoriesRepo) CreateRentalHistory(data rental_histories_service.RentalHistories) (rental_histories_service.RentalHistories, error) {
+func (m *MockRentalHistoriesRepo) CreateRentalHistory(data model.RentalHistories) (model.RentalHistories, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRentalHistory", data)
-	ret0, _ := ret[0].(rental_histories_service.RentalHistories)
+	ret0, _ := ret[0].(model.RentalHistories)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockRentalHistoriesRepoMockRecorder) CreateRentalHistory(data interfac
 }
 
 // GetAll mocks base method.
-func (m *MockRentalHistoriesRepo) GetAll(userId string) ([]rental_histories_service.RentalHistories, error) {
+func (m *MockRentalHistoriesRepo) GetAll(userId string) ([]model.RentalHistories, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", userId)
-	ret0, _ := ret[0].([]rental_histories_service.RentalHistories)
+	ret0, _ := ret[0].([]model.RentalHistories)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

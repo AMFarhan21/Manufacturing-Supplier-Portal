@@ -5,7 +5,7 @@
 package mock_equipments_service
 
 import (
-	equipments_service "Manufacturing-Supplier-Portal/service/equipments_service"
+	model "Manufacturing-Supplier-Portal/model"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,10 +35,10 @@ func (m *MockEquipmentsRepo) EXPECT() *MockEquipmentsRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockEquipmentsRepo) Create(data equipments_service.Equipments) (equipments_service.Equipments, error) {
+func (m *MockEquipmentsRepo) Create(data model.Equipments) (model.Equipments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", data)
-	ret0, _ := ret[0].(equipments_service.Equipments)
+	ret0, _ := ret[0].(model.Equipments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -64,10 +64,10 @@ func (mr *MockEquipmentsRepoMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // GetAll mocks base method.
-func (m *MockEquipmentsRepo) GetAll() ([]equipments_service.Equipments, error) {
+func (m *MockEquipmentsRepo) GetAll() ([]model.Equipments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]equipments_service.Equipments)
+	ret0, _ := ret[0].([]model.Equipments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -79,10 +79,10 @@ func (mr *MockEquipmentsRepoMockRecorder) GetAll() *gomock.Call {
 }
 
 // GetById mocks base method.
-func (m *MockEquipmentsRepo) GetById(id int) (equipments_service.Equipments, error) {
+func (m *MockEquipmentsRepo) GetById(id int) (model.Equipments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", id)
-	ret0, _ := ret[0].(equipments_service.Equipments)
+	ret0, _ := ret[0].(model.Equipments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,10 +94,10 @@ func (mr *MockEquipmentsRepoMockRecorder) GetById(id interface{}) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockEquipmentsRepo) Update(id int, data equipments_service.Equipments) (equipments_service.Equipments, error) {
+func (m *MockEquipmentsRepo) Update(id int, data model.Equipments) (model.Equipments, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", id, data)
-	ret0, _ := ret[0].(equipments_service.Equipments)
+	ret0, _ := ret[0].(model.Equipments)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

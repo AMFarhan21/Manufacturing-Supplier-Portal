@@ -1,7 +1,7 @@
 package xendit
 
 import (
-	"Manufacturing-Supplier-Portal/service/xendit_service"
+	"Manufacturing-Supplier-Portal/model"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,7 +27,7 @@ func NewXenditRepository(xenditApi, xenditUrl, xenditWebhookUrl, successRedirect
 	}
 }
 
-func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email, name, category string, paymentId int, amount float64) (string, error) {
+func (r XenditRepository) XenditInvoiceUrl(userId, purpose, username, email, name, category string, paymentId int, amount float64) (string, error) {
 
 	url := r.xenditUrl
 	method := "POST"
@@ -52,12 +52,9 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 			}
 		],
 		"metadata": {
-			"store_branch": "Makassar",
-			"user_id": "%s",
-			"payment_id": "%d",
-			"username": "%s"
+			"store_branch": "Makassar"
 		}
-	}      `, paymentId, userId, amount, description, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category, userId, paymentId, username))
+	}      `, paymentId, userId, amount, purpose, email, r.successRedirectUrl, r.failureRedirectUrl, name, amount, category))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
@@ -79,9 +76,8 @@ func (r XenditRepository) XenditInvoiceUrl(userId, description, username, email,
 	if err != nil {
 		return "", err
 	}
-	// fmt.Println(string(body))
 
-	var xenditReponse xendit_service.XenditResponse
+	var xenditReponse model.XenditResponse
 	err = json.Unmarshal(body, &xenditReponse)
 	if err != nil {
 		return "", nil

@@ -1,4 +1,4 @@
-package rental_histories_service
+package model
 
 import "time"
 
