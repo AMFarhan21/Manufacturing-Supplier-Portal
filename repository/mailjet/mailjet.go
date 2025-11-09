@@ -58,7 +58,7 @@ func (r MailJet) SendMailjetMessage(senderEmail string, senderName string, recei
 				],
 				"Subject": "Validate your email!",
 				"TextPart": "Validate your email https://youtube.com",
-				"HTMLPart": "<h3>Validate your email using this link <a href=\"https://manufacturing-supplier-portal.onrender.com/api/auth/ValidateEmailAddress\"> Welcome %s"
+				"HTMLPart": "<h3>Click this to <a href=\"https://manufacturing-supplier-portal.onrender.com/api/auth/ValidateEmailAddress\">Validate</a> <br/> Welcome %s"
 			}
 		]
 	}`, senderEmail, senderName, receiverEmail, receiverName, receiverName))
