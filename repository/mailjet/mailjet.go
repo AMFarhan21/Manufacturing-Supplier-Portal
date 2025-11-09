@@ -1,7 +1,6 @@
 package mailjet
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -44,31 +43,28 @@ func NewMailjet(mailjetURL string, mailjetAPI string, mailjetSECRET string) *Mai
 func (r MailJet) SendMailjetMessage(senderEmail string, senderName string, receiverEmail string, receiverName string) error {
 	url := r.mailjetURL
 	method := "POST"
-
-	message := Message{
-		From: From{
-			Email: senderEmail,
-			Name:  senderName,
-		},
-		To: []From{
+	payload := strings.NewReader(fmt.Sprintf(`{
+    "Messages": [
 			{
-				Email: senderEmail,
-				Name:  senderName,
-			},
-		},
-		Subject:  "Validate your email",
-		TextPart: "TESTING",
-		HTMLPart: fmt.Sprintf(`<h3>Validate your email using this link <a href=\"https://manufacturing-supplier-portal.onrender.com\api\ValidateEmailAddress\">Validate your email!</a><h3><br/> Welcome %s`, receiverName),
-	}
-
-	payload := []PayloadSendEmail{{
-		[]Message{message},
-	}}
-
-	payloadByte, _ := json.Marshal(payload)
+				"From": {
+					"Email": "%s",
+					"Name": "%s"
+				},
+				"To": [
+					{
+						"Email": "%s",
+						"Name": "%s"
+					}
+				],
+				"Subject": "Validate your email!",
+				"TextPart": "Validate your email https://youtube.com",
+				"HTMLPart": "<h3>Validate your email using this link <a href=\"https://manufacturing-supplier-portal.onrender.com/api/auth/ValidateEmailAddress\"> Welcome %s"
+			}
+		]
+	}`, senderEmail, senderName, receiverEmail, receiverName, receiverName))
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, strings.NewReader(string(payloadByte)))
+	req, err := http.NewRequest(method, url, payload)
 
 	if err != nil {
 		return err

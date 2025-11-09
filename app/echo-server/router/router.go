@@ -41,7 +41,7 @@ func Router(
 	users.GET("/me", usersController.GetUserLogin, userAccess)
 	users.GET("/list", usersController.GetAllUsers, adminAccess)
 	users.POST("/topup", usersController.TopUpDeposit, userAccess)
-	users.GET("/api/ValidateEmailAddress", usersController.VerifiedEmail)
+	users.GET("/ValidateEmailAddress", usersController.VerifiedEmail)
 
 	equipments := e.Group("api/equipments", middlewares)
 	equipments.GET("", equipmentsController.GetAllEquipments, userAccess)
