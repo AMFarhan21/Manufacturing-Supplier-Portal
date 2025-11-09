@@ -70,7 +70,7 @@ func (ctrl UsersController) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
-	user, err := ctrl.service.RegisterUser(model.Users{
+	validate, err := ctrl.service.RegisterUser(model.Users{
 		Username:      request.Username,
 		Email:         request.Email,
 		Password:      request.Password,
@@ -87,15 +87,19 @@ func (ctrl UsersController) RegisterUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 	}
 
-	log.Print("Successfully register a user")
-	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(model.UsersResponse{
-		Id:            user.Id,
-		Username:      user.Username,
-		Email:         user.Email,
-		DepositAmount: user.DepositAmount,
-		Role:          user.Role,
-	}))
+	log.Print("Please check your email to validate")
+	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(validate))
+}
 
+func (ctrl UsersController) VerifiedEmail(c echo.Context) error {
+	verifiedUser, err := ctrl.service.VerifiedEmail()
+	if err != nil {
+		log.Print("Error on verified email server:", err.Error())
+		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
+	}
+
+	log.Print("Successfully register a user")
+	return c.JSON(http.StatusCreated, fres.Response.StatusCreated(verifiedUser))
 }
 
 // @Summary      Login

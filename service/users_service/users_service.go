@@ -2,6 +2,7 @@ package users_service
 
 import (
 	"Manufacturing-Supplier-Portal/model"
+	"Manufacturing-Supplier-Portal/service/mailjet_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
 	"time"
@@ -13,43 +14,59 @@ import (
 
 type (
 	UsersService struct {
-		usersRepo  UsersRepo
-		xenditRepo xendit_service.XenditRepo
-		jwtSecret  string
+		usersRepo   UsersRepo
+		xenditRepo  xendit_service.XenditRepo
+		mailjetRepo mailjet_service.MailjetRepo
+		jwtSecret   string
 	}
 	Service interface {
-		RegisterUser(data model.Users) (model.Users, error)
+		RegisterUser(data model.Users) (string, error)
 		Login(email, password string) (string, error)
 		FindUserById(id string) (model.UsersResponse, error)
 		GetAll() ([]model.UsersResponse, error)
 		TopUp(userId string, amount float64) (float64, error)
 		GetTopUpInvoiceURL(userId string, amount float64) (string, error)
+		VerifiedEmail() (model.Users, error)
 	}
 )
 
-func NewUsersService(usersRepo UsersRepo, xenditRepo xendit_service.XenditRepo, secret string) Service {
+func NewUsersService(usersRepo UsersRepo, xenditRepo xendit_service.XenditRepo, mailjetRepo mailjet_service.MailjetRepo, secret string) Service {
 	return &UsersService{
-		usersRepo:  usersRepo,
-		xenditRepo: xenditRepo,
-		jwtSecret:  secret,
+		usersRepo:   usersRepo,
+		xenditRepo:  xenditRepo,
+		mailjetRepo: mailjetRepo,
+		jwtSecret:   secret,
 	}
 }
 
-func (s UsersService) RegisterUser(data model.Users) (model.Users, error) {
+var registerData model.Users
+
+func (s UsersService) RegisterUser(data model.Users) (string, error) {
 	user, _ := s.usersRepo.FindByEmail(data.Email)
 	if user.Email != "" {
-		return model.Users{}, errors.New("email already exists")
+		return "", errors.New("email already exists")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return model.Users{}, err
+		return "", err
 	}
 
 	data.Id = uuid.NewString()
 	data.Password = string(hashedPassword)
 
-	return s.usersRepo.Register(data)
+	err = s.mailjetRepo.SendMailjetMessage("andifarhanhakzah@gmail.com", "farhan", data.Email, data.Username)
+	if err != nil {
+		return "", err
+	}
+
+	registerData = data
+
+	return "Check your email and validate", nil
+}
+
+func (s UsersService) VerifiedEmail() (model.Users, error) {
+	return s.usersRepo.Register(registerData)
 }
 
 func (s UsersService) Login(email, password string) (string, error) {

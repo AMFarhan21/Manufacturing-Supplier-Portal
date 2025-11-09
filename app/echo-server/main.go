@@ -4,6 +4,7 @@ import (
 	"Manufacturing-Supplier-Portal/app/echo-server/controller"
 	"Manufacturing-Supplier-Portal/app/echo-server/router"
 	"Manufacturing-Supplier-Portal/repository/equipments_repository"
+	"Manufacturing-Supplier-Portal/repository/mailjet"
 	"Manufacturing-Supplier-Portal/repository/payments_repository"
 	"Manufacturing-Supplier-Portal/repository/rental_histories_repository"
 	"Manufacturing-Supplier-Portal/repository/rentals_repository"
@@ -59,10 +60,15 @@ func main() {
 	successRedirectUrl := os.Getenv("REDIRECT_URL")
 	failureRedirectUrl := os.Getenv("REDIRECT_URL")
 
+	mailjetAPI := os.Getenv("MAILJET_API")
+	mailjetSECRET := os.Getenv("MAILJET_SECRET")
+	mailjetURL := os.Getenv("MAILJET_URL")
+
 	xenditRepository := xendit.NewXenditRepository(xenditApi, xenditUrl, xenditWebhookUrl, successRedirectUrl, failureRedirectUrl)
+	mailjetRepo := mailjet.NewMailjet(mailjetURL, mailjetAPI, mailjetSECRET)
 
 	usersRepository := users_repository.NewUsersGormRepository(db)
-	usersService := users_service.NewUsersService(usersRepository, xenditRepository, secret)
+	usersService := users_service.NewUsersService(usersRepository, xenditRepository, mailjetRepo, secret)
 	usersController := controller.NewUsersController(usersService)
 
 	equipmentsRepository := equipments_repository.NewEquipmentsGormRepository(db)
