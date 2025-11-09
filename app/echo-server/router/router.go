@@ -36,7 +36,7 @@ func Router(
 	auth := e.Group("api/auth")
 	auth.POST("/register", usersController.RegisterUser)
 	auth.POST("/login", usersController.LoginUser)
-	auth.GET("/ValidateEmailAddress", usersController.VerifiedEmail)
+	auth.GET("/validateemailaddress", usersController.VerifiedEmail)
 
 	users := e.Group("api/users", middlewares)
 	users.GET("/me", usersController.GetUserLogin, userAccess)
