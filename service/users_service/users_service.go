@@ -5,6 +5,7 @@ import (
 	"Manufacturing-Supplier-Portal/service/mailjet_service"
 	"Manufacturing-Supplier-Portal/service/xendit_service"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -26,7 +27,12 @@ type (
 		GetAll() ([]model.UsersResponse, error)
 		TopUp(userId string, amount float64) (float64, error)
 		GetTopUpInvoiceURL(userId string, amount float64) (string, error)
-		VerifiedEmail() (model.Users, error)
+		VerifiedEmail(token string) (model.Users, error)
+	}
+
+	MapClaims struct {
+		Data model.Users `json:"data"`
+		*jwt.RegisteredClaims
 	}
 )
 
@@ -38,8 +44,6 @@ func NewUsersService(usersRepo UsersRepo, xenditRepo xendit_service.XenditRepo, 
 		jwtSecret:   secret,
 	}
 }
-
-var registerData model.Users
 
 func (s UsersService) RegisterUser(data model.Users) (string, error) {
 	user, _ := s.usersRepo.FindByEmail(data.Email)
@@ -55,18 +59,45 @@ func (s UsersService) RegisterUser(data model.Users) (string, error) {
 	data.Id = uuid.NewString()
 	data.Password = string(hashedPassword)
 
-	err = s.mailjetRepo.SendMailjetMessage("andifarhanhakzah@gmail.com", "farhan", data.Email, data.Username)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MapClaims{
+		Data: data,
+		RegisteredClaims: &jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+		},
+	})
+
+	signedToken, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
 		return "", err
 	}
 
-	registerData = data
+	err = s.mailjetRepo.SendMailjetMessage("andifarhanhakzah@gmail.com", "farhan", data.Email, data.Username, signedToken)
+	if err != nil {
+		return "", err
+	}
 
 	return "Check your email and validate", nil
 }
 
-func (s UsersService) VerifiedEmail() (model.Users, error) {
-	return s.usersRepo.Register(registerData)
+func (s UsersService) VerifiedEmail(token string) (model.Users, error) {
+
+	res, err := jwt.ParseWithClaims(token, &MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(s.jwtSecret), nil
+	})
+	if err != nil {
+		return model.Users{}, err
+	}
+
+	claims, ok := res.Claims.(*MapClaims)
+	if !ok && !res.Valid {
+
+	}
+
+	data := claims.Data
+
+	log.Print(data)
+
+	return s.usersRepo.Register(data)
 }
 
 func (s UsersService) Login(email, password string) (string, error) {

@@ -40,7 +40,7 @@ func NewMailjet(mailjetURL string, mailjetAPI string, mailjetSECRET string) *Mai
 	}
 }
 
-func (r MailJet) SendMailjetMessage(senderEmail string, senderName string, receiverEmail string, receiverName string) error {
+func (r MailJet) SendMailjetMessage(senderEmail string, senderName string, receiverEmail string, receiverName string, signedToken string) error {
 	url := r.mailjetURL
 	method := "POST"
 	payload := strings.NewReader(fmt.Sprintf(`{
@@ -58,10 +58,10 @@ func (r MailJet) SendMailjetMessage(senderEmail string, senderName string, recei
 				],
 				"Subject": "Validate your email!",
 				"TextPart": "Validate your email https://youtube.com",
-				"HTMLPart": "<h3>Click this to <a href=\"https://manufacturing-supplier-portal.onrender.com/api/auth/validateemailaddress\">Validate</a> <br/> Welcome %s"
+				"HTMLPart": "<h3>Click this to <a href=\"https://manufacturing-supplier-portal.onrender.com/api/auth/validateemailaddress?token=%v\">Validate</a> <br/> Welcome %s"
 			}
 		]
-	}`, senderEmail, senderName, receiverEmail, receiverName, receiverName))
+	}`, senderEmail, senderName, receiverEmail, receiverName, signedToken, receiverName))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)

@@ -92,7 +92,9 @@ func (ctrl UsersController) RegisterUser(c echo.Context) error {
 }
 
 func (ctrl UsersController) VerifiedEmail(c echo.Context) error {
-	verifiedUser, err := ctrl.service.VerifiedEmail()
+	token := c.QueryParam("token")
+
+	verifiedUser, err := ctrl.service.VerifiedEmail(token)
 	if err != nil {
 		log.Print("Error on verified email server:", err.Error())
 		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
