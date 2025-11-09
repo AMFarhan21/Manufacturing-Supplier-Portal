@@ -96,6 +96,10 @@ func (ctrl UsersController) VerifiedEmail(c echo.Context) error {
 
 	verifiedUser, err := ctrl.service.VerifiedEmail(token)
 	if err != nil {
+		if strings.Contains(err.Error(), "expired url") {
+			log.Print("Error on VerifiedEmail:", err.Error())
+			return c.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
+		}
 		log.Print("Error on verified email server:", err.Error())
 		return c.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
 	}

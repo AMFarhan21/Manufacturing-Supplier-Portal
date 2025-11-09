@@ -62,7 +62,7 @@ func (s UsersService) RegisterUser(data model.Users) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MapClaims{
 		Data: data,
 		RegisteredClaims: &jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 5)),
 		},
 	})
 
@@ -80,20 +80,21 @@ func (s UsersService) RegisterUser(data model.Users) (string, error) {
 }
 
 func (s UsersService) VerifiedEmail(token string) (model.Users, error) {
+	claims := jwt.MapClaims{}
 
-	res, err := jwt.ParseWithClaims(token, &MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.jwtSecret), nil
 	})
 	if err != nil {
 		return model.Users{}, err
 	}
 
-	claims, ok := res.Claims.(*MapClaims)
-	if !ok && !res.Valid {
+	data := claims["data"].(model.Users)
 
+	expAt, _ := claims.GetExpirationTime()
+	if time.Now().After(expAt.Time) {
+		return model.Users{}, errors.New("expired url")
 	}
-
-	data := claims.Data
 
 	log.Print(data)
 
