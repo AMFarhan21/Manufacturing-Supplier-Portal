@@ -80,7 +80,7 @@ func (s UsersService) RegisterUser(data model.Users) (string, error) {
 }
 
 func (s UsersService) VerifiedEmail(token string) (model.Users, error) {
-	claims := jwt.MapClaims{}
+	claims := &MapClaims{}
 
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.jwtSecret), nil
@@ -89,16 +89,14 @@ func (s UsersService) VerifiedEmail(token string) (model.Users, error) {
 		return model.Users{}, err
 	}
 
-	data := claims["data"].(model.Users)
-
 	expAt, _ := claims.GetExpirationTime()
 	if time.Now().After(expAt.Time) {
 		return model.Users{}, errors.New("expired url")
 	}
 
-	log.Print(data)
+	log.Print(claims.Data)
 
-	return s.usersRepo.Register(data)
+	return s.usersRepo.Register(claims.Data)
 }
 
 func (s UsersService) Login(email, password string) (string, error) {
